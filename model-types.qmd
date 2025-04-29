@@ -47,13 +47,12 @@ library(ggthemes)
 
 ## Assumptions
 
-(1) Linear relationship between $Y$ and the predictors $X$
+For the linear regression model $\mathbf{Y} = \mathbf{X}\beta + e$, we have the following assumptions: \
 
-(2) Independence between observations (i.e., the errors are uncorrelated)
-
-(2) Constant error variance
-
-(3) Normality of errors
+(1) Errors have mean 0: $\mathbb{E}[Y \mid X] = 0$ \
+(2) The error variance is constant: $\text{Var}[e \mid \mathbf{X}] = \sigma^2$ \
+(3) The errors are uncorrelated (the data points are iid): $\text{Var}[e \mid \mathbf{X}] = \sigma^2$\
+(4) The errors are normally distributed
 
 
 ## Diagnostics and Solutions 
@@ -141,7 +140,7 @@ p1 + p2
 
 From @fig-partial-resids(a), we see that residual walk score has a nonlinear relationship with estimated house price in 2007 -- as indicated by the smoothed residual curve (in blue) diverging from the predicted effect line (in red). We would address this nonlinearity by fitting natural splines on the residual walk score, with one knot at the median. @fig-partial-resids(b) provides the updated partial residual plots when we add natural splines to the residual walk score. We see now that the predicted effect line (in red) tracks closely to the smoothed residual curve (in blue) without over-fitting to model to the turns in the smoothed residual curve. 
 
-**Line ups:** If we aren't sure whether the true relationship between the outcome and a given predictor is non-linear, we can conduct a partial residual line-up with the `regressinator` package. 
+**Lineups:** If we aren't sure whether the true relationship between the outcome and a given predictor is non-linear, we can conduct a partial residual visual lineup.
 
 For instance, it is not entirely clear whether distance has a non-linear relationship to estimated house price in 2007 or if this is just due to the high-leverage home with the largest distance to the rail trail. @fig-lineup-distance shows the partial residual line-up. If we cannot pick out the partial residual plot corresponding to the real data from the simulated data, we can conclude that there is  insufficient evidence of a non-linear relationship between distance to rail trail and estimated house price in 2007 at a significance level of 0.05.
 
@@ -183,9 +182,11 @@ decrypt("QUg2 qFyF Rx 8tLRyRtx ZP")
 Simplest way to add polynomial terms is with `I()`:
 
 ```{r}
-gt(tidy(lm(price2007 ~ distance + resid_walkscore + I(resid_walkscore^2) +
-                squarefeet + bedgroup + zip, data = rail_trail_modeling))) |>
-  fmt_number(decimals = 3)
+#| echo: true
+#| code-fold: false
+
+fit_new <- lm(price2007 ~ distance + resid_walkscore + I(resid_walkscore^2) +
+                squarefeet + bedgroup + zip, data = rail_trail_modeling)
 ```
 
 If there is numerical issues (e.g., from the predictor having large values), we can use the `poly()`function which constructs the design matric using an orthogonal polynomial basis. 
@@ -193,16 +194,15 @@ If there is numerical issues (e.g., from the predictor having large values), we 
 **A downside is that the coefficients are no longer is terms of the interpretable regressor terms. The fitted values though wil be the same between the two approaches for adding polynomial terms**. 
 
 ```{r}
-gt(tidy(lm(price2007 ~ distance + poly(resid_walkscore, degree = 2) +
-                squarefeet + bedgroup + zip, data = rail_trail_modeling))) |>
-  fmt_number(decimals = 3)
+#| echo: true
+#| code-fold: false
+fit_new <- lm(price2007 ~ distance + poly(resid_walkscore, degree = 2) + squarefeet + 
+                bedgroup + zip, data = rail_trail_modeling)
 ```
 
 2. Add regression splines to the model
 
-Regression splines model relationships as being piecewise polynomial. They require us to choose knots, which are the fixed points between which the function is polynomial. Two common approaches are *natural splines* and *B-spline basis*. 
-
-Statisticians almost universally use cubic splines. Cubic splines are continuous in their first and second derivatives, making the knots almost visually imperceptible in plots of the spline.
+Regression splines model relationships as being piecewise polynomial. They require us to choose knots, which are the fixed points between which the function is polynomial. Two common approaches are *natural splines* and *B-spline basis*. Statisticians almost universally use cubic splines. Cubic splines are continuous in their first and second derivatives, making the knots almost visually imperceptible in plots of the spline.
 
 For knot selection, a typical approach is to use quantiles of the data as knots -- erring on the side of less knots (especially if there is few observations).
 
@@ -217,7 +217,7 @@ fit_new <- lm(price2007 ~ distance + ns(resid_walkscore, knots = c(0.5)) +
 
 ### Constant Error Variance
 
-Errors with non-constant variance are called *heteroskedastic*. To detect heteroskedasticity, we can examine residual plots against the fitted values. 
+Errors with non-constant variance are called *heteroskedastic*. To detect heteroskedasticity, we can examine the residuals plotted against the fitted values. 
 
 ```{r}
 #| label: fig-constant-errors
@@ -232,20 +232,20 @@ fit_new |>
   theme(axis.text = element_text(color = "black"))
 ```
 
-In @fig-constant-errors, we have non-constant error variance. Indeed, there appears to be a quadratic relationship between our fitted values and our residual terms. 
+In @fig-constant-errors, we have non-constant error variance. Indeed, there appears to be an approximately quadratic relationship between our fitted values and our residual terms. 
 
 **We can remedy non-constant error variance by using the sandwich estimator for the variance of our estimators in all inference.**
 
 ```{r}
+#| echo: true
+#| code-fold: false
 # uses sandwich estimator with HC3 estimator for Omega
 Confint(fit_new, vcov = vcovHC(fit_new))
 ```
 
 ### Normality of Errors
 
-*Note:* that both the standardized and Studentized residuals involve dividing by an estimate of variance, so they will not be exactly normally distributed, making tests for their normality inappropriate—the null will always be false.
-
-Therefore, we can check for non-normality of errors using residual Q-Q plots.  Using the standardized residuals, we can detect gross deviations from normality while ignoring small deviations in non-normality. An example of a Q-Q plot for linear regression is in @fig-qq-plot. Since we are doing linear regression, the theoretical quantiles correspond to a *normal distribution with mean 0 and variance 1*.
+We can check for non-normality of errors using residual Q-Q plots.  Using the standardized residuals, we can detect gross deviations from normality while ignoring small deviations in non-normality. An example of a Q-Q plot for linear regression is in @fig-qq-plot. Since we are doing linear regression, the theoretical quantiles correspond to a *normal distribution with mean 0 and variance 1*.
 
 ```{r}
 #| label: fig-qq-plot
@@ -259,7 +259,7 @@ augment(fit_new) |>
 ```
 
 
-Like with partial residuals, we can use a line-up to detect whether the non-normality in errors is significant (at a significance level of 0.05). 
+Like with partial residuals, we can use a lineup to detect whether the non-normality in errors is statistically significant (at a significance level of 0.05). 
 
 ```{r}
 set.seed(123)
@@ -326,11 +326,7 @@ augment(fit_new) |>
 
 ## Collinearity
 
-When the model matrix $X$ is not full column rank, its columns span a lower-dimensional space. There is still a unique perpendicular projection of $Y$ onto this space, and hence a unique $\hat Y$. *But* the coordinates of that fit are not unique, meaning that there are infinite values of $\hat \beta$ that correspond to the same squared error/prediction. **If we care about inference on $\hat \beta$ this is a serious problem**.
-
-*Example:* If we have predictors that represent proportions of a whole, there will be perfect linear dependence, as the proportions must sum to one. 
-
-*A common approach is to leave out one category to prevent this, just as treatment contrasts drop one factor level*
+When the model matrix $X$ is not full column rank, its columns span a lower-dimensional space. There is still a unique perpendicular projection of $Y$ onto this space, and hence a unique $\hat Y$. *But* the coordinates of that fit are not unique, meaning that there are infinite values of $\hat \beta$ that correspond to the same squared error/prediction. **If we care about inference on $\hat \beta$ this is a serious problem**. 
 
 ```{r}
 loess_wrapper <- function(data, mapping, ...){
@@ -358,6 +354,11 @@ rail_trail_modeling |>
         axis.text = element_text(color = "black", size = 6.5))
 ```
 
+
+### Non-pairwise Collinearity Metrics
+
+**Condition Number:**
+
 However, multiple variables can be collinear even when individual pairs of variables have low correlation. One way to detect non-pairwise collinearity is to use the condition number, where we compare the largest and smallest eigenvalues of $X^\intercal X$:
 
 ```{r}
@@ -375,6 +376,8 @@ kappa(t(scaled_x) %*% scaled_x)
 
 Ideally, we want the condition number to be small. The general cut-off is condition numbers larger than $50$ or $100$. So, from the results above, we see that there is potentially concerning levels of collinearity among our predictors, which could influence the accuracy of our inference.
 
+**Variance Inflation Factors:**
+
 Another way to look at collinearity is with variance inflation factors (VIF), which can be interpreted as showing how much the variance of $\hat \beta_j$ is inflated relative to a model where there is no collinearity (and all columns are orthogonal). 
 ```{r}
 #| echo: true
@@ -386,9 +389,13 @@ car::vif(lm(price2007 ~ distance + ns(resid_walkscore, knots = c(0.5)) +
 
 A general rule of thumb is that VIF values exceeding 5 warrant further investigation, and VIFs exceeding 10 are signs of serious multicollinearity requiring correction.
 
-*General Notes:* If we are confronted with collinearity, then, the question to ask is “Have we chosen the correct predictors for the research question?” If we have, there is little to be done; if we have not, we can reconsider our choice of predictors and perhaps eliminate the collinear ones.
+**General Notes:** If we are confronted with collinearity, then, the question to ask is:
 
-If we are interested in prediction rather than in the coefficients, collinearity is a problem insofar as it creates high prediction variance, and we might reconsider our model and use a penalization model to reduce the prediction variance.
+  - "Have we chosen the correct predictors for the research question?"
+  
+If we have, there is little to be done; if we have not, we can reconsider our choice of predictors and perhaps eliminate the collinear ones.
+
+If we are interested in prediction rather than in the coefficients, *collinearity is a problem insofar as it creates high prediction variance, and we might reconsider our model and use a penalization model to reduce the prediction variance.*s
 
 ## Interactions
 
@@ -396,11 +403,11 @@ An interaction allows one predictor’s association with the outcome to depend o
 
 When an interaction is present, the normal interpretation of coefficients as slopes no longer holds for the predictors involved in the interaction.
 
-**Example 7.4**
+**See Example 7.4**
 
 ## Hypothesis Tests
 
-### T Tests
+### t Tests
 
 Many useful null hypotheses can be written in terms of linear combinations of the coefficients. For example, consider a linear model with a continuous predictor $X_1$ and dummy-coded regressor $X_2 \in \{0,1 \}$:
 
@@ -434,6 +441,8 @@ tbl_regression(fit_new)
 **If we have non-constant error variance and thus use the sandwich estimator, we can use the following code to conduct t tests and present our results:**
 
 ```{r}
+#| echo: true
+#| code-fold: false
 p.values <- coeftest(fit_new, vcov = vcovHC(fit_new)) |>
   tidy() |> _$p.value
 
@@ -521,9 +530,9 @@ Interpreting the intercept, quoting confidence intervals, and conducting hypothe
 
 - Holding all other regressors constant
 
-*Exact interpretation depending on if the predictor is continuous or a factor level.*
+**Exact interpretation depends on if the predictor is continuous or a factor level:**
 
-**Test for a factor coefficient:** For a given flipper length, gentoo penguins have a smaller mean bill length ($M = 47.5$ mm, $SD = 3.1$) than Adelie penguins ($M = 38.8$ mm, $SD = 2.7$), $t(336) = -3.5, p = 0.001$.
+- **Test for a factor coefficient:** For a given flipper length, gentoo penguins have a smaller mean bill length ($M = 47.5$ mm, $SD = 3.1$) than Adelie penguins ($M = 38.8$ mm, $SD = 2.7$), $t(336) = -3.5, p = 0.001$.
 
 *In part calculated using `group_by()`:*
 
@@ -538,23 +547,21 @@ penguins |>
 ```
 
 
-**Confidence interval for a factor coefficient:** For a given flipper length, gentoo penguin bills are shorter than Adelie penguin bills by an average of $34.3$ mm (95% CI $[15.01, 15.64]$). *flipped due to interpreting as shorter*
+- **Confidence interval for a factor coefficient:** For a given flipper length, gentoo penguin bills are shorter than Adelie penguin bills by an average of $34.3$ mm (95% CI $[15.01, 15.64]$). 
 
-**Test for slope:** In Adelie penguins, there was a statistically significant association between flipper length and bill length, $\hat \beta = 0.13$, $t(336) = 4.17, p < 0.001$.
+- **Test for slope:** In Adelie penguins, there was a statistically significant association between flipper length and bill length, $\hat \beta = 0.13$, $t(336) = 4.17, p < 0.001$.
 
-**Describe a slope:** Among Adelie penguins, each additional millimeter of flipper length is associated with $0.13$ mm of additional bill length, on average (95% CI $[0.07, 0.2]$).
+- **Describe a slope:** Among Adelie penguins, each additional millimeter of flipper length is associated with $0.13$ mm of additional bill length, on average (95% CI $[0.07, 0.2]$).
 
 ### Interactions
 
-An interaction allows one predictor’s association with the outcome to depend on values of another predictor. **something about holding constant??**
+**Describing an interaction coefficient:** For the interaction term between flipper length and species from @tbl-penguin-results: For Adelie penguins (the baseline level), the association between bill length and flipper length is $0.13$ mm of bill length per millimeter of flipper length, on average (95% CI $[0.07, 0.20]$). But for Chinstrap penguins, the association is $0.13 + 0.09 = 0.22$ mm of bill length per millimeter of flipper length, on average (95% CI $[0.11, 0.31]$). [**LOOK AT THEOREM 5.5 AND HW 3 TO CONFIRM**]
 
-**Describe an interaction coefficient:** For the interaction term between flipper length and species from @tbl-penguin-results: For Adelie penguins (the baseline level), the association between bill length and flipper length is $0.13$ mm of bill length per millimeter of flipper length, on average (95% CI $[0.07, 0.20]$). But for Chinstrap penguins, the association is $0.13 + 0.09 = 0.22$ mm of bill length per millimeter of flipper length, on average (95% CI $[0.11, 0.31]$).
-
-**LOOK AT THEOREM 5.5 AND HW 3**
-
-**A helpful way to visualize interaction terms, polynomial terms, (or other complex relationships) is to use an effects plot**
+**A helpful way to visualize interaction terms, polynomial terms, (or other complex relationships) is to use an effects plot:**
 
 ```{r}
+#| echo: true
+#| code-fold: false
 predict_response(penguin_fit,
                  terms = c("flipper_length_mm", "species")) |>
   plot() +
@@ -573,6 +580,8 @@ If we fit a spline or a polynomial for our predictor-of-interest, we cannot dete
 1. Do a LRT/F-test for nested models to obtain the overall significance of the predictor-of-interest.
 
 ```{r}
+#| echo: true
+#| code-fold: false
 anova(fit_new, fit_no_resid_ws)
 ```
 
@@ -581,6 +590,8 @@ anova(fit_new, fit_no_resid_ws)
 
 
 ```{r}
+#| echo: true
+#| code-fold: false
 predict_response(fit_new,
                  terms = c("resid_walkscore")) |>
   plot()
@@ -591,13 +602,13 @@ predict_response(fit_new,
 
 
 ```{r}
+#| echo: true
+#| code-fold: false
 preds <- predict_response(fit_new, terms = c("resid_walkscore"))
 head(preds)
 ```
 
 For example, when the residual walk score is $-43.01$, the predicted house price (in 2007) is \$259,570 in Northampton, MA (95% CI $[\$213,440, \$305,710]$) versus when the residual walk score is $-36.08$, the predicted house price (in 2007) is \$271,780 in Northampton, MA (95% CI $[\$233,600, \$309,960]$) -- holding all other covariates at their mean or reference level.
-
-**This is somewhat a bad example because residual walk score is not very interpretable, but in practice, should use values that would be practically significant**
 
 # Logistic Regression
 
@@ -614,7 +625,7 @@ $$
 \end{aligned}
 $$
 
-Notably:
+and notably:
 
 $$\hat y_i = \widehat{\text{Pr}}(Y = 1 \mid X = x_i) = \text{logit}^{-1}(\hat \beta^\intercal x_i)$$
 
@@ -629,7 +640,9 @@ Logistic regression makes two basic assumptions about the population relationshi
 
 ## Linearity Diagnostics
 
-To examine whether the log-odds is linearity related to our main regressor of interest (or our predictors more generally), we can use an **Empirical link plot**. @fig-logistic-empirical-link shows that TWA core temperature during surgery appears to have an approximately linear relationship with the log-odds of superficial post-op infection but possibly a non-linear relationship with log-odds of a serious post-op infection.
+**Empirical Link Plot (EDA):**
+
+**Example:** @fig-logistic-empirical-link shows that TWA core temperature during surgery appears to have an approximately linear relationship with the log-odds of superficial post-op infection but possibly a non-linear relationship with log-odds of a serious post-op infection.
 
 
 ```{r}
@@ -684,7 +697,11 @@ p2 <- core_temperature |>
 p1 + p2
 ```
 
-Another method is to use **Partial Residuals**, just like we did for linear regression.  @fig-prelim-partials shows that surgery duration and TWA core temperature both appear to have non-linear relationships with the log-odds of serious infection
+**Partial Residuals:**
+
+Another method is to use partial residuals, just like we did for linear regression.  
+
+**Example:** @fig-prelim-partials shows that surgery duration and TWA core temperature both appear to have non-linear relationships with the log-odds of serious infection, which confirms what we see in the empirical link plot.
 
 
 ```{r}
@@ -747,13 +764,16 @@ partial_residuals(updated_fit) |>
   theme(strip.text = element_text(face = "bold"))
 ```
 
+**Randomized Quantile Residuals:**
 
+A third method is to use randomized quantile residuals. We can use plots of randomized quantile residuals against predictors and/or fitted values, as with any other residuals, to check the overall fit of our model. 
 
-A third method is to use **Randomized Quantile Residuals.** We can use plots of randomized quantile residuals against predictors and fitted values, as with any other residuals, to check the overall fit of our model. If the model is correctly specified, we would want the conditional mean of the randomized quantile residuals to be approximately $0.5$.
+  - If the model is correctly specified, we would want the conditional mean of the randomized quantile
+    residuals to be approximately $0.5$.
 
 It is also useful to check that their distribution is indeed uniform (e.g. with a Q-Q plot). When the model is incorrectly specified, the distribution will not be uniform, producing patterns on the residual plots that can be interpreted. 
 
-Below is an example with Pima women data from the `MASS` package.
+**Example:** Below is an example with Pima women data from the `MASS` package.
 
 
 ```{r}
@@ -808,13 +828,13 @@ ggplot(calibration_data, aes(x = x, y = y)) +
 
 We start by converting the response from a factor to 0 or 1, so the smoother can take the average. @fig-calibration-plot shows that the calibration looks good across most of the range in our data, but as the predicted probability gets over 0.6, we see odd behavior; examining the plotted points, it appears this is due to a few observations with high predicted probability but $Y = 0$. We should not get too worried over two or three observations, so this is not particularly concerning.
 
-**But perfect calibration does not make a good model. Calibration hence should be used together with other measures of the adequacy of the model fit, not on its own.**
+*But perfect calibration does not make a good model. Calibration hence should be used together with other measures of the adequacy of the model fit, not on its own!*
 
 ## Hypothesis Tests
 
-### Wald Tests
+Wald tests are what `tidy()` defaults to for GLMs. Wald tests use a $z$ test statistic and, by default `tidy()` tests $\beta = 0$.
 
-In a Wald Test, 
+### Wald Tests
 
 First, we can find a confidence interval for a probability for a specific set of regressors:
 
@@ -832,8 +852,6 @@ ilogit(pred_lp$fit + (
     pred_lp$se.fit
 ))
 ```
-
-
 
 
 ### Confidence Intervals
@@ -883,16 +901,16 @@ tbl_regression(pima_fit, exponentiate = TRUE) |>
   cols_align_decimal(c(estimate, p.value))
 ```
 
-**Example interpretation:** @tbl-logistic-coef gives the results of the logistic regression fit. Women with prior pregnancies were less likely to have diabetes ($OR = 0.63, 95\% CI [0.27, 1.5]$), but this result was not statistically significant ($z = -1.1, p = 0.27$). A larger sample may be necessary to determine if a relationship exists in the population.
+**Example interpretation:** @tbl-logistic-coef gives the results of the logistic regression fit. Women with prior pregnancies were less likely to have diabetes ($OR = 0.63$, 95% CI $[0.27, 1.5]$), but this result was not statistically significant ($z = -1.1, p = 0.27$). A larger sample may be necessary to determine if a relationship exists in the population.
 
-**Another one:** Each unit of increase in blood pressure (measured in mm Hg) is associated with an increase in the log-odds of diabetes of $0.04$, or a multiplication in the odds of diabetes by $1.04$ ($95% CI [1.01, 1.07]$).
+**Another one:** Each unit of increase in blood pressure (measured in mm Hg) is associated with an increase in the log-odds of diabetes of $0.04$, or a multiplication in the odds of diabetes by $1.04$ (95% CI $[1.01, 1.07]$).
 
 
 ## Outliers
 
-We can approximate Cook's distance fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before. 
+We can approximate **Cook's distance** fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before. 
 
-We could also likely remove the outliers and see if it qualitatively changes our findings if we aren't sure.
+We could also likely **remove the outliers and see if it qualitatively changes our findings** if we aren't sure.
 
 # Other Exponential Families
 
@@ -906,13 +924,13 @@ When we fit a generalized linear model (such as Binomial and Poisson models), we
 
 (3) The mean of the response is related to the predictors through the chosen link function and functional form
 
-*Residual diagnostics can be used to check the latter two assumptions.*
+**Residual diagnostics can be used to check the latter two assumptions.**
 
 ## Diagnostics
 
-We can use similar diagnostics to what we used for logistic regression. A good precursor to these is an *emprical link plot*, which would be done in EDA section. 
+We can use similar diagnostics to what we used for logistic regression. A good precursor to these is an **empirical link plot**, which would be done in the EDA section. 
 
-**Partial Residuals**
+**Partial Residuals:**
 
 ```{r}
 ants <- read.csv("data/ants.csv")
@@ -936,7 +954,7 @@ partial_residuals(ants_fit) |>
 ```
 
 
-**Randomized Quantile Residuals**
+**Randomized Quantile Residuals:**
 
 ```{r}
 library(agridat)
@@ -977,16 +995,32 @@ The binomial distribution is suitable when there is a fixed and known total numb
 The model is (with a logit-link function, the default):
 
 $$n_iY_i \mid X_i = x_i \sim \text{Binomial}(n_i, \text{logit}(\beta^\intercal x_i))$$
-Hence, the sample proportion $Y_i$ should be proportional to $\text{logit}(\beta^\intercal x_i)$. **$Y_i$ is the rate/probability of success!**
+Hence, the sample proportion $Y_i$ should be proportional to $\text{logit}(\beta^\intercal x_i)$. 
+
+   - **$Y_i$ is the rate/probability of success!**
 
 In `R`, a binomial response variable for $n > 1$ can be provided as a a two-column matrix with the number of successes and the number of failures.
+
+```{r}
+#| echo: true
+#| code-fold: false
+
+library(agridat)
+
+seed_fit_1 <- glm(cbind(germ, n - germ) ~
+                    extract + gen,
+                  data = crowder.seeds, family = binomial())
+seed_fit_2 <- glm(cbind(germ, n - germ) ~
+                    extract * gen,
+                  data = crowder.seeds, family = binomial())
+```
 
 
 ### Inference and Predictions
 
-```{r}
-library(agridat)
+**Crowder Seed Example:**
 
+```{r}
 crowder.seeds |>
   mutate(germ_rate = germ/n) |>
   ggplot(aes(x = gen, y = germ_rate, color = extract))+
@@ -996,24 +1030,14 @@ crowder.seeds |>
 ```
 
 
-
-
-```{r}
-seed_fit_1 <- glm(cbind(germ, n - germ) ~
-                    extract + gen,
-                  data = crowder.seeds, family = binomial())
-seed_fit_2 <- glm(cbind(germ, n - germ) ~
-                    extract * gen,
-                  data = crowder.seeds, family = binomial())
-```
-
 ```{r}
 seed_test <- anova(seed_fit_1, seed_fit_2, test = "Chisq")
 seed_test
 ```
+
 Based on the analysis of deviance table, we conclude that that extract differs by side type, $\chi^2(1) = 6.41, p = 0.011$. 
 
-Like with logistic regression, we can use `tbl_regression` to compute the coefficients in each model. E.g., for the interaction model:
+  - Like with logistic regression, we can use `tbl_regression()` to compute the coefficients in each model. *E.g., for the interaction model:*
 
 ```{r}
 #| echo: true
@@ -1021,7 +1045,7 @@ Like with logistic regression, we can use `tbl_regression` to compute the coeffi
 tbl_regression(seed_fit_2, exponentiate = TRUE)
 ```
 
-We can also compute the predictions and the standard errors. From the table, we see that the '75 seeds with cucumber extract have the highest predicted probability of germination.
+  -   We can also compute the predictions and the standard errors. From the table, we see that the '75 seeds with cucumber extract have the highest predicted probability of germination.
 
 ```{r}
 #| echo: true
@@ -1072,6 +1096,8 @@ $$\mathbb{E}[Y \mid X = x] = \exp(\beta^\intercal x)$$
 
 ### Inference and Predictions
 
+**Ant Example:**
+
 ```{r}
 # omitted EDA but idea is to see which covariates are associated with the ant species counts in the data
 
@@ -1099,6 +1125,8 @@ exp(confint(ants_fit))
 ### Offsets
 
 Offsets are useful when the observed counts recorded for different population sizes or time periods. 
+
+**Smoking Example:**
 
 ```{r}
 smokers <- read.csv("data/smokers.csv")
@@ -1152,7 +1180,6 @@ additive_smoke <- glm(deaths ~ age + smoke, offset = log(py),
 anova(additive_smoke, smoke_fit, test = "Chisq")
 ```
 
-
 **Risk Ratio Calculation:**
 
 Now suppose we want to compare smokers and non-smokers at age 40, calculating a *risk ratio*: the ratio of risk of death for smokers versus non-smokers. A simple way would be to make a prediction and take the ratio. To predict the rate of death, we can predict the mean number of deaths for one person-year:
@@ -1192,7 +1219,7 @@ Overdispersion is when there is more variance in $Y$ than the response distribut
 
 A remedy for overdispersion is to use quasi-likleihood. These can be fit using `quasibinomial()` and `quasipoisson()` families in the `glm()` function. Compared to non-quasi models, the estimates of the coefficients will be the same, **only the confidence intervals differ, witht heir width expanding by a constant factor**
 
-*We can check for overdispersion using randomized quantile residuals*
+**We can check for overdispersion using Q-Q plot of randomized quantile residuals**
 
 **Example:** returning to the seed data:
 
@@ -1209,9 +1236,11 @@ tbl_regression(seed_quasi, exponentiate = TRUE)
 ```
 
 
-**Important Note:** since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid and we can no longer use randomized quantile residuals or do line-ups. *We can still still do Wald Tests and interpret coefficients using the new Confidence Interval*
+**Important Note:** since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid and we can no longer use randomized quantile residuals or do line-ups. 
 
-Estimating the dispersion parameter...
+**We can still still do Wald Tests and interpret coefficients using the new Confidence Interval**
+
+*Estimating the dispersion parameter...*
 
 ```{r}
 #| echo: true
@@ -1221,10 +1250,6 @@ sum(residuals(ants_fit, type = 'deviance')^2)/ants_fit$df.residual
 
 
 ## Outliers
-
-In a GLM, there is no "error" (in the sense of an error term  in the model) and no error distribution, but it is still possible to have outliers. 
-
-An observation may have an usual value that has a large influence on the fitted $\hat \beta$. In small datasets with a few variables, we can spot such outliers in scatterplots of the data; but in larger datasets they are harder to notice, and so diagnostics are helpful.
 
 We can approximate **Cook's distance** fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before. 
 
@@ -1244,20 +1269,19 @@ So far, when we have discussed inference (such as hypothesis tests and confidenc
 
 To do this inference, we relied on mathematical derivations of the distribution of estimators and statistics. These derivations rely on certain \underline{assumptions} about the data and the population it is drawn from, and if those assumptions are not true, the derivations are not valid. 
 
-Boostrapping is an alternative way to esitmate the distributionof estimators and statistics. This can lead to more accurate uncertainty quantification for coefficients (that said, if the sample is not iid, then resampling from the observed data is not likel obtaining a sample from the population...)
+Boostrapping is an alternative way to esitmate the distribution of estimators and statistics. This can lead to more accurate uncertainty quantification for coefficients (that said, if the sample is not iid, then resampling from the observed data is not likel obtaining a sample from the population...)
 
 # Penalized Models
 
-Helpful if we care about prediction over inference and thus want to minimize the total error (which is a combination of bias and variance).
+  - Helpful if we care about prediction over inference and thus want to minimize the total error (which is a combination of bias and variance).
 
-Penalization methods are also helpful when we have $p > n$ since that have a unique solution even with a higher dimension of regressors than observations.
-
+-   Penalization methods are also helpful when we have $p > n$ since that have a unique solution even with a higher dimension of regressors than observations.
 
 ## Ridge Regression
 
-Ridge Regression penalizes the L-2 norm of the covariaes. We can implement Ridge Regression using the `glmnet` package, which requires us to provide $X$ as a matrix and $Y$ as a vector of responses. Note that `glmnet()` standardizes each column to have variance 1 automatically.
+Ridge Regression penalizes the L-2 norm of the covariates. We can implement Ridge Regression using the `glmnet` package, which requires us to provide $X$ as a matrix and $Y$ as a vector of responses. Note that `glmnet()` standardizes each column to have variance 1 automatically.
 
-[For Ridge Regression we have $\alpha = 0$!]
+*[For Ridge Regression, $\alpha = 0$]*
 
 ```{r}
 library(mvtnorm)
@@ -1293,7 +1317,6 @@ plot(cv_results)
 
 While the coefficients of Ridge Regression are not fully **interpretable**, we can look at which predictors have the largest magnitudes to get a sense of the relative effect size between different covariates and our outcome variable.
 
-
 ```{r}
 coefs <- coef(ridge_fit, s = cv_results$lambda.min)
 coefs[order(abs(coefs[, 1]), decreasing = TRUE)[1:5], ]
@@ -1303,9 +1326,9 @@ coefs[order(abs(coefs[, 1]), decreasing = TRUE)[1:5], ]
 
 ## Lasso
 
-Lasso is another penalized regression model. Its most useful propoerty is that (depending on the value of the penalization parameter), it forces many of the coefficient estimates to be exactly zero. That is, **Lasso promotes sparsity**, which matches real-world populations where we expect the true coefficients to be sparse (think: genetics)
+Lasso is another penalized regression model. Its most useful propoerty is that (depending on the value of the penalization parameter), it forces many of the coefficient estimates to be exactly zero. That is, **Lasso promotes sparsity**, which matches real-world populations where we expect the true coefficients to be sparse (*think: genetics*)
 
-We can implement Lasso with `glmnet` (the only difference is now we set $\alpha = 1$). 
+We can implement Lasso with `glmnet` (*the only difference is now we set $\alpha = 1$*). 
 
 ```{r}
 lasso_fit <- glmnet(x, sparse_samp$y, alpha = 1)
@@ -1340,7 +1363,7 @@ Elastic net generalizes the case of Ridge Regression and Lasso by allowing both 
 
 *To cross-validate over both lambda and alpha, you have to manually loop over alpha values yourself, and run cv.glmnet() inside that loop.*
 
-## Penalization Example (on Genetic Data)
+## Lasso Model Example (on Genetic Data)
 
 ```{r}
 #| echo: true
@@ -1457,7 +1480,7 @@ test_data <- testing(car_split)
 
 ## Nested Cross Validation
 
-Often, we might need to do cross-validation and want to keep a hold out set that we can test our model on later. This is called nested cross validation. Here would be a general framework for nested cross validation:
+Often, we might need to do cross-validation and want to keep a hold out set that we can test our model on later. Here would be a a framework for nested cross validation:
 
 (1) Split the full dataset into testing and training (we might do this randomly, by time, by group, etc.)
 
@@ -1478,9 +1501,9 @@ Often, we might need to do cross-validation and want to keep a hold out set that
 
 **For regression:**
 
-- Mean-Squared Error
+- Mean-Squared Error (MSE)
 
-- Root Mean-Squared Error: a measure of the average magnitude of the errors between predicted and actual values in a regression model
+- Root Mean-Squared Error (RMSE): a measure of the average magnitude of the errors between predicted and actual values in a regression model
 
 - Actual versus Predicted Outcome Plot (ideal would be along the main diagonal)
 
@@ -1514,16 +1537,25 @@ Steps to handling missingness:
 
 - When missingness only depends on observed covariates
 
+**See examples in Chapter 22**
 
-*Impute if clear value that should be filled in. Also, can impute to mean if needed (use just mean for time sake or if there is not much variability in the covariate, though can lead to biased estimates)*
+*Some general notes:*
+
+  - Impute if clear value that should be filled in.
+  
+  - Can impute to mean if needed (if there is not much variability in the covariate
+  
+  - Generally, we weary of imputing the response variable only it is very clear
 
 # Multiple Testing
 
-One concern if we are conducting several hypothesis tests is multiple testing. While not in the scope for the DA exam, it could be an important limitation to the report.
+One concern if we are conducting several hypothesis tests is multiple testing. While not in the scope for the DA exam to correct for (likely), it could be an important limitation to mention in the report.
 
 # Causal Claims
 
-If we are confident in our causal model and can control for the necessary confounders, we can estimate a chosen causal path.  In this situation, our obligation is to make clear the limitations of our claims:
+If we are confident in our causal model and can control for the necessary confounders, we can estimate a chosen causal path.  
+
+**In this situation, our obligation is to make clear the limitations of our claims:**
 
 1. If our regression model is misspecified or otherwise incorrect, our estimates may be wrong.
 
@@ -1531,4 +1563,4 @@ If we are confident in our causal model and can control for the necessary confou
 
 3. If our data comes from a specific sample or subset of a population, the causal claims may not generalize beyond it.
 
-We also have to be careful about the scope of our causal claims. Choosing confounders to allow us to estimate one coefficient causally does not necessarily imply that all the other coefficients in the model can be interpreted causally.
+*Note: choosing confounders to allow us to estimate one coefficient causally does not necessarily imply that all the other coefficients in the model can be interpreted causally.*

@@ -137,11 +137,14 @@ window.Quarto = {
   <li><a href="#normality-of-errors" id="toc-normality-of-errors" class="nav-link" data-scroll-target="#normality-of-errors"><span class="header-section-number">1.2.3</span> Normality of Errors</a></li>
   </ul></li>
   <li><a href="#contaminated-errors-and-outliers" id="toc-contaminated-errors-and-outliers" class="nav-link" data-scroll-target="#contaminated-errors-and-outliers"><span class="header-section-number">1.3</span> Contaminated Errors and Outliers</a></li>
-  <li><a href="#collinearity" id="toc-collinearity" class="nav-link" data-scroll-target="#collinearity"><span class="header-section-number">1.4</span> Collinearity</a></li>
+  <li><a href="#collinearity" id="toc-collinearity" class="nav-link" data-scroll-target="#collinearity"><span class="header-section-number">1.4</span> Collinearity</a>
+  <ul class="collapse">
+  <li><a href="#non-pairwise-collinearity-metrics" id="toc-non-pairwise-collinearity-metrics" class="nav-link" data-scroll-target="#non-pairwise-collinearity-metrics"><span class="header-section-number">1.4.1</span> Non-pairwise Collinearity Metrics</a></li>
+  </ul></li>
   <li><a href="#interactions" id="toc-interactions" class="nav-link" data-scroll-target="#interactions"><span class="header-section-number">1.5</span> Interactions</a></li>
   <li><a href="#hypothesis-tests" id="toc-hypothesis-tests" class="nav-link" data-scroll-target="#hypothesis-tests"><span class="header-section-number">1.6</span> Hypothesis Tests</a>
   <ul class="collapse">
-  <li><a href="#t-tests" id="toc-t-tests" class="nav-link" data-scroll-target="#t-tests"><span class="header-section-number">1.6.1</span> T Tests</a></li>
+  <li><a href="#t-tests" id="toc-t-tests" class="nav-link" data-scroll-target="#t-tests"><span class="header-section-number">1.6.1</span> t Tests</a></li>
   <li><a href="#f-tests-for-nested-models" id="toc-f-tests-for-nested-models" class="nav-link" data-scroll-target="#f-tests-for-nested-models"><span class="header-section-number">1.6.2</span> F tests for Nested Models</a></li>
   </ul></li>
   <li><a href="#coefficient-interpretation" id="toc-coefficient-interpretation" class="nav-link" data-scroll-target="#coefficient-interpretation"><span class="header-section-number">1.7</span> Coefficient Interpretation</a>
@@ -191,7 +194,7 @@ window.Quarto = {
   <li><a href="#ridge-regression" id="toc-ridge-regression" class="nav-link" data-scroll-target="#ridge-regression"><span class="header-section-number">5.1</span> Ridge Regression</a></li>
   <li><a href="#lasso" id="toc-lasso" class="nav-link" data-scroll-target="#lasso"><span class="header-section-number">5.2</span> Lasso</a></li>
   <li><a href="#the-elastic-net" id="toc-the-elastic-net" class="nav-link" data-scroll-target="#the-elastic-net"><span class="header-section-number">5.3</span> The Elastic Net</a></li>
-  <li><a href="#penalization-example-on-genetic-data" id="toc-penalization-example-on-genetic-data" class="nav-link" data-scroll-target="#penalization-example-on-genetic-data"><span class="header-section-number">5.4</span> Penalization Example (on Genetic Data)</a></li>
+  <li><a href="#lasso-model-example-on-genetic-data" id="toc-lasso-model-example-on-genetic-data" class="nav-link" data-scroll-target="#lasso-model-example-on-genetic-data"><span class="header-section-number">5.4</span> Lasso Model Example (on Genetic Data)</a></li>
   </ul></li>
   <li><a href="#prediction" id="toc-prediction" class="nav-link" data-scroll-target="#prediction"><span class="header-section-number">6</span> Prediction</a>
   <ul>
@@ -248,11 +251,16 @@ window.Quarto = {
 <h1 data-number="1"><span class="header-section-number">1</span> Linear Regression</h1>
 <section id="assumptions" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="assumptions"><span class="header-section-number">1.1</span> Assumptions</h2>
+<p>For the linear regression model <span class="math inline">\mathbf{Y} = \mathbf{X}\beta + e</span>, we have the following assumptions:<br>
+</p>
 <ol type="1">
-<li><p>Linear relationship between <span class="math inline">Y</span> and the predictors <span class="math inline">X</span></p></li>
-<li><p>Independence between observations (i.e., the errors are uncorrelated)</p></li>
-<li><p>Constant error variance</p></li>
-<li><p>Normality of errors</p></li>
+<li>Errors have mean 0: <span class="math inline">\mathbb{E}[Y \mid X] = 0</span><br>
+</li>
+<li>The error variance is constant: <span class="math inline">\text{Var}[e \mid \mathbf{X}] = \sigma^2</span><br>
+</li>
+<li>The errors are uncorrelated (the data points are iid): <span class="math inline">\text{Var}[e \mid \mathbf{X}] = \sigma^2</span><br>
+</li>
+<li>The errors are normally distributed</li>
 </ol>
 </section>
 <section id="diagnostics-and-solutions" class="level2" data-number="1.2">
@@ -328,7 +336,7 @@ window.Quarto = {
 </div>
 </div>
 <p>From <a href="#fig-partial-resids" class="quarto-xref">Figure&nbsp;1</a>(a), we see that residual walk score has a nonlinear relationship with estimated house price in 2007 – as indicated by the smoothed residual curve (in blue) diverging from the predicted effect line (in red). We would address this nonlinearity by fitting natural splines on the residual walk score, with one knot at the median. <a href="#fig-partial-resids" class="quarto-xref">Figure&nbsp;1</a>(b) provides the updated partial residual plots when we add natural splines to the residual walk score. We see now that the predicted effect line (in red) tracks closely to the smoothed residual curve (in blue) without over-fitting to model to the turns in the smoothed residual curve.</p>
-<p><strong>Line ups:</strong> If we aren’t sure whether the true relationship between the outcome and a given predictor is non-linear, we can conduct a partial residual line-up with the <code>regressinator</code> package.</p>
+<p><strong>Lineups:</strong> If we aren’t sure whether the true relationship between the outcome and a given predictor is non-linear, we can conduct a partial residual visual lineup.</p>
 <p>For instance, it is not entirely clear whether distance has a non-linear relationship to estimated house price in 2007 or if this is just due to the high-leverage home with the largest distance to the rail trail. <a href="#fig-lineup-distance" class="quarto-xref">Figure&nbsp;2</a> shows the partial residual line-up. If we cannot pick out the partial residual plot corresponding to the real data from the simulated data, we can conclude that there is insufficient evidence of a non-linear relationship between distance to rail trail and estimated house price in 2007 at a significance level of 0.05.</p>
 <div class="cell">
 <details class="code-fold">
@@ -377,1074 +385,19 @@ window.Quarto = {
 </ol>
 <p>Simplest way to add polynomial terms is with <code>I()</code>:</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gt</span>(<span class="fu">tidy</span>(<span class="fu">lm</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> resid_walkscore <span class="sc">+</span> <span class="fu">I</span>(resid_walkscore<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                squarefeet <span class="sc">+</span> bedgroup <span class="sc">+</span> zip, <span class="at">data =</span> rail_trail_modeling))) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="inkveklfco" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#inkveklfco table {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#inkveklfco thead, #inkveklfco tbody, #inkveklfco tfoot, #inkveklfco tr, #inkveklfco td, #inkveklfco th {
-  border-style: none;
-}
-
-#inkveklfco p {
-  margin: 0;
-  padding: 0;
-}
-
-#inkveklfco .gt_table {
-  display: table;
-  border-collapse: collapse;
-  line-height: normal;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#inkveklfco .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#inkveklfco .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#inkveklfco .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 3px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#inkveklfco .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#inkveklfco .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#inkveklfco .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#inkveklfco .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#inkveklfco .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#inkveklfco .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#inkveklfco .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#inkveklfco .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#inkveklfco .gt_spanner_row {
-  border-bottom-style: hidden;
-}
-
-#inkveklfco .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#inkveklfco .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#inkveklfco .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#inkveklfco .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#inkveklfco .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#inkveklfco .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#inkveklfco .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#inkveklfco .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#inkveklfco .gt_row_group_first th {
-  border-top-width: 2px;
-}
-
-#inkveklfco .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#inkveklfco .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#inkveklfco .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#inkveklfco .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#inkveklfco .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#inkveklfco .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#inkveklfco .gt_last_grand_summary_row_top {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: double;
-  border-bottom-width: 6px;
-  border-bottom-color: #D3D3D3;
-}
-
-#inkveklfco .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#inkveklfco .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#inkveklfco .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#inkveklfco .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#inkveklfco .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#inkveklfco .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#inkveklfco .gt_left {
-  text-align: left;
-}
-
-#inkveklfco .gt_center {
-  text-align: center;
-}
-
-#inkveklfco .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#inkveklfco .gt_font_normal {
-  font-weight: normal;
-}
-
-#inkveklfco .gt_font_bold {
-  font-weight: bold;
-}
-
-#inkveklfco .gt_font_italic {
-  font-style: italic;
-}
-
-#inkveklfco .gt_super {
-  font-size: 65%;
-}
-
-#inkveklfco .gt_footnote_marks {
-  font-size: 75%;
-  vertical-align: 0.4em;
-  position: initial;
-}
-
-#inkveklfco .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#inkveklfco .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#inkveklfco .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#inkveklfco .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#inkveklfco .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#inkveklfco .gt_indent_5 {
-  text-indent: 25px;
-}
-
-#inkveklfco .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#inkveklfco div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
-</style>
-
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<thead>
-<tr class="header gt_col_headings">
-<th id="term" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">term</th>
-<th id="estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">estimate</th>
-<th id="std.error" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">std.error</th>
-<th id="statistic" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">statistic</th>
-<th id="p.value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p.value</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">(Intercept)</td>
-<td class="gt_row gt_right" headers="estimate">103.919</td>
-<td class="gt_row gt_right" headers="std.error">18.304</td>
-<td class="gt_row gt_right" headers="statistic">5.677</td>
-<td class="gt_row gt_right" headers="p.value">0.000</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">distance</td>
-<td class="gt_row gt_right" headers="estimate">−14.436</td>
-<td class="gt_row gt_right" headers="std.error">4.997</td>
-<td class="gt_row gt_right" headers="statistic">−2.889</td>
-<td class="gt_row gt_right" headers="p.value">0.005</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">resid_walkscore</td>
-<td class="gt_row gt_right" headers="estimate">0.366</td>
-<td class="gt_row gt_right" headers="std.error">0.274</td>
-<td class="gt_row gt_right" headers="statistic">1.338</td>
-<td class="gt_row gt_right" headers="p.value">0.184</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">I(resid_walkscore^2)</td>
-<td class="gt_row gt_right" headers="estimate">−0.024</td>
-<td class="gt_row gt_right" headers="std.error">0.010</td>
-<td class="gt_row gt_right" headers="statistic">−2.455</td>
-<td class="gt_row gt_right" headers="p.value">0.016</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">squarefeet</td>
-<td class="gt_row gt_right" headers="estimate">145.471</td>
-<td class="gt_row gt_right" headers="std.error">10.074</td>
-<td class="gt_row gt_right" headers="statistic">14.440</td>
-<td class="gt_row gt_right" headers="p.value">0.000</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">bedgroup3 beds</td>
-<td class="gt_row gt_right" headers="estimate">7.305</td>
-<td class="gt_row gt_right" headers="std.error">12.249</td>
-<td class="gt_row gt_right" headers="statistic">0.596</td>
-<td class="gt_row gt_right" headers="p.value">0.552</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">bedgroup4+ beds</td>
-<td class="gt_row gt_right" headers="estimate">−29.090</td>
-<td class="gt_row gt_right" headers="std.error">15.026</td>
-<td class="gt_row gt_right" headers="statistic">−1.936</td>
-<td class="gt_row gt_right" headers="p.value">0.056</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">zip1062</td>
-<td class="gt_row gt_right" headers="estimate">−30.195</td>
-<td class="gt_row gt_right" headers="std.error">9.421</td>
-<td class="gt_row gt_right" headers="statistic">−3.205</td>
-<td class="gt_row gt_right" headers="p.value">0.002</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fit_new <span class="ot">&lt;-</span> <span class="fu">lm</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> resid_walkscore <span class="sc">+</span> <span class="fu">I</span>(resid_walkscore<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                squarefeet <span class="sc">+</span> bedgroup <span class="sc">+</span> zip, <span class="at">data =</span> rail_trail_modeling)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>If there is numerical issues (e.g., from the predictor having large values), we can use the <code>poly()</code>function which constructs the design matric using an orthogonal polynomial basis.</p>
 <p><strong>A downside is that the coefficients are no longer is terms of the interpretable regressor terms. The fitted values though wil be the same between the two approaches for adding polynomial terms</strong>.</p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gt</span>(<span class="fu">tidy</span>(<span class="fu">lm</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> <span class="fu">poly</span>(resid_walkscore, <span class="at">degree =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                squarefeet <span class="sc">+</span> bedgroup <span class="sc">+</span> zip, <span class="at">data =</span> rail_trail_modeling))) <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="nqgazrcikt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#nqgazrcikt table {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#nqgazrcikt thead, #nqgazrcikt tbody, #nqgazrcikt tfoot, #nqgazrcikt tr, #nqgazrcikt td, #nqgazrcikt th {
-  border-style: none;
-}
-
-#nqgazrcikt p {
-  margin: 0;
-  padding: 0;
-}
-
-#nqgazrcikt .gt_table {
-  display: table;
-  border-collapse: collapse;
-  line-height: normal;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#nqgazrcikt .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#nqgazrcikt .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 3px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#nqgazrcikt .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#nqgazrcikt .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#nqgazrcikt .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#nqgazrcikt .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#nqgazrcikt .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#nqgazrcikt .gt_spanner_row {
-  border-bottom-style: hidden;
-}
-
-#nqgazrcikt .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#nqgazrcikt .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#nqgazrcikt .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#nqgazrcikt .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#nqgazrcikt .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#nqgazrcikt .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#nqgazrcikt .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#nqgazrcikt .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#nqgazrcikt .gt_row_group_first th {
-  border-top-width: 2px;
-}
-
-#nqgazrcikt .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#nqgazrcikt .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#nqgazrcikt .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#nqgazrcikt .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_last_grand_summary_row_top {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: double;
-  border-bottom-width: 6px;
-  border-bottom-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#nqgazrcikt .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#nqgazrcikt .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#nqgazrcikt .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#nqgazrcikt .gt_left {
-  text-align: left;
-}
-
-#nqgazrcikt .gt_center {
-  text-align: center;
-}
-
-#nqgazrcikt .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#nqgazrcikt .gt_font_normal {
-  font-weight: normal;
-}
-
-#nqgazrcikt .gt_font_bold {
-  font-weight: bold;
-}
-
-#nqgazrcikt .gt_font_italic {
-  font-style: italic;
-}
-
-#nqgazrcikt .gt_super {
-  font-size: 65%;
-}
-
-#nqgazrcikt .gt_footnote_marks {
-  font-size: 75%;
-  vertical-align: 0.4em;
-  position: initial;
-}
-
-#nqgazrcikt .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#nqgazrcikt .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#nqgazrcikt .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#nqgazrcikt .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#nqgazrcikt .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#nqgazrcikt .gt_indent_5 {
-  text-indent: 25px;
-}
-
-#nqgazrcikt .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#nqgazrcikt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
-</style>
-
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<thead>
-<tr class="header gt_col_headings">
-<th id="term" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">term</th>
-<th id="estimate" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">estimate</th>
-<th id="std.error" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">std.error</th>
-<th id="statistic" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">statistic</th>
-<th id="p.value" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p.value</th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">(Intercept)</td>
-<td class="gt_row gt_right" headers="estimate">97.401</td>
-<td class="gt_row gt_right" headers="std.error">18.126</td>
-<td class="gt_row gt_right" headers="statistic">5.374</td>
-<td class="gt_row gt_right" headers="p.value">0.000</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">distance</td>
-<td class="gt_row gt_right" headers="estimate">−14.436</td>
-<td class="gt_row gt_right" headers="std.error">4.997</td>
-<td class="gt_row gt_right" headers="statistic">−2.889</td>
-<td class="gt_row gt_right" headers="p.value">0.005</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">poly(resid_walkscore, degree = 2)1</td>
-<td class="gt_row gt_right" headers="estimate">14.777</td>
-<td class="gt_row gt_right" headers="std.error">43.588</td>
-<td class="gt_row gt_right" headers="statistic">0.339</td>
-<td class="gt_row gt_right" headers="p.value">0.735</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">poly(resid_walkscore, degree = 2)2</td>
-<td class="gt_row gt_right" headers="estimate">−110.903</td>
-<td class="gt_row gt_right" headers="std.error">45.183</td>
-<td class="gt_row gt_right" headers="statistic">−2.455</td>
-<td class="gt_row gt_right" headers="p.value">0.016</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">squarefeet</td>
-<td class="gt_row gt_right" headers="estimate">145.471</td>
-<td class="gt_row gt_right" headers="std.error">10.074</td>
-<td class="gt_row gt_right" headers="statistic">14.440</td>
-<td class="gt_row gt_right" headers="p.value">0.000</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">bedgroup3 beds</td>
-<td class="gt_row gt_right" headers="estimate">7.305</td>
-<td class="gt_row gt_right" headers="std.error">12.249</td>
-<td class="gt_row gt_right" headers="statistic">0.596</td>
-<td class="gt_row gt_right" headers="p.value">0.552</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="term">bedgroup4+ beds</td>
-<td class="gt_row gt_right" headers="estimate">−29.090</td>
-<td class="gt_row gt_right" headers="std.error">15.026</td>
-<td class="gt_row gt_right" headers="statistic">−1.936</td>
-<td class="gt_row gt_right" headers="p.value">0.056</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="term">zip1062</td>
-<td class="gt_row gt_right" headers="estimate">−30.195</td>
-<td class="gt_row gt_right" headers="std.error">9.421</td>
-<td class="gt_row gt_right" headers="statistic">−3.205</td>
-<td class="gt_row gt_right" headers="p.value">0.002</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit_new <span class="ot">&lt;-</span> <span class="fu">lm</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> <span class="fu">poly</span>(resid_walkscore, <span class="at">degree =</span> <span class="dv">2</span>) <span class="sc">+</span> squarefeet <span class="sc">+</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                bedgroup <span class="sc">+</span> zip, <span class="at">data =</span> rail_trail_modeling)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="2" type="1">
 <li>Add regression splines to the model</li>
 </ol>
-<p>Regression splines model relationships as being piecewise polynomial. They require us to choose knots, which are the fixed points between which the function is polynomial. Two common approaches are <em>natural splines</em> and <em>B-spline basis</em>.</p>
-<p>Statisticians almost universally use cubic splines. Cubic splines are continuous in their first and second derivatives, making the knots almost visually imperceptible in plots of the spline.</p>
+<p>Regression splines model relationships as being piecewise polynomial. They require us to choose knots, which are the fixed points between which the function is polynomial. Two common approaches are <em>natural splines</em> and <em>B-spline basis</em>. Statisticians almost universally use cubic splines. Cubic splines are continuous in their first and second derivatives, making the knots almost visually imperceptible in plots of the spline.</p>
 <p>For knot selection, a typical approach is to use quantiles of the data as knots – erring on the side of less knots (especially if there is few observations).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_new <span class="ot">&lt;-</span> <span class="fu">lm</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> <span class="fu">ns</span>(resid_walkscore, <span class="at">knots =</span> <span class="fu">c</span>(<span class="fl">0.5</span>)) <span class="sc">+</span> </span>
@@ -1454,7 +407,7 @@ window.Quarto = {
 </section>
 <section id="constant-error-variance" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="constant-error-variance"><span class="header-section-number">1.2.2</span> Constant Error Variance</h3>
-<p>Errors with non-constant variance are called <em>heteroskedastic</em>. To detect heteroskedasticity, we can examine residual plots against the fitted values.</p>
+<p>Errors with non-constant variance are called <em>heteroskedastic</em>. To detect heteroskedasticity, we can examine the residuals plotted against the fitted values.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1480,14 +433,11 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>In <a href="#fig-constant-errors" class="quarto-xref">Figure&nbsp;3</a>, we have non-constant error variance. Indeed, there appears to be a quadratic relationship between our fitted values and our residual terms.</p>
+<p>In <a href="#fig-constant-errors" class="quarto-xref">Figure&nbsp;3</a>, we have non-constant error variance. Indeed, there appears to be an approximately quadratic relationship between our fitted values and our residual terms.</p>
 <p><strong>We can remedy non-constant error variance by using the sandwich estimator for the variance of our estimators in all inference.</strong></p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># uses sandwich estimator with HC3 estimator for Omega</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Confint</span>(fit_new, <span class="at">vcov =</span> <span class="fu">vcovHC</span>(fit_new))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Standard errors computed by vcovHC(fit_new) </code></pre>
 </div>
@@ -1506,8 +456,7 @@ zip1062                              -30.040888 -50.154050  -9.927726</code></pr
 </section>
 <section id="normality-of-errors" class="level3" data-number="1.2.3">
 <h3 data-number="1.2.3" class="anchored" data-anchor-id="normality-of-errors"><span class="header-section-number">1.2.3</span> Normality of Errors</h3>
-<p><em>Note:</em> that both the standardized and Studentized residuals involve dividing by an estimate of variance, so they will not be exactly normally distributed, making tests for their normality inappropriate—the null will always be false.</p>
-<p>Therefore, we can check for non-normality of errors using residual Q-Q plots. Using the standardized residuals, we can detect gross deviations from normality while ignoring small deviations in non-normality. An example of a Q-Q plot for linear regression is in <a href="#fig-qq-plot" class="quarto-xref">Figure&nbsp;4</a>. Since we are doing linear regression, the theoretical quantiles correspond to a <em>normal distribution with mean 0 and variance 1</em>.</p>
+<p>We can check for non-normality of errors using residual Q-Q plots. Using the standardized residuals, we can detect gross deviations from normality while ignoring small deviations in non-normality. An example of a Q-Q plot for linear regression is in <a href="#fig-qq-plot" class="quarto-xref">Figure&nbsp;4</a>. Since we are doing linear regression, the theoretical quantiles correspond to a <em>normal distribution with mean 0 and variance 1</em>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1531,7 +480,7 @@ zip1062                              -30.040888 -50.154050  -9.927726</code></pr
 </div>
 </div>
 </div>
-<p>Like with partial residuals, we can use a line-up to detect whether the non-normality in errors is significant (at a significance level of 0.05).</p>
+<p>Like with partial residuals, we can use a lineup to detect whether the non-normality in errors is statistically significant (at a significance level of 0.05).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1615,8 +564,6 @@ zip1062                              -30.040888 -50.154050  -9.927726</code></pr
 <section id="collinearity" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="collinearity"><span class="header-section-number">1.4</span> Collinearity</h2>
 <p>When the model matrix <span class="math inline">X</span> is not full column rank, its columns span a lower-dimensional space. There is still a unique perpendicular projection of <span class="math inline">Y</span> onto this space, and hence a unique <span class="math inline">\hat Y</span>. <em>But</em> the coordinates of that fit are not unique, meaning that there are infinite values of <span class="math inline">\hat \beta</span> that correspond to the same squared error/prediction. <strong>If we care about inference on <span class="math inline">\hat \beta</span> this is a serious problem</strong>.</p>
-<p><em>Example:</em> If we have predictors that represent proportions of a whole, there will be perfect linear dependence, as the proportions must sum to one.</p>
-<p><em>A common approach is to leave out one category to prevent this, just as treatment contrasts drop one factor level</em></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1652,6 +599,9 @@ zip1062                              -30.040888 -50.154050  -9.927726</code></pr
 </div>
 </div>
 </div>
+<section id="non-pairwise-collinearity-metrics" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="non-pairwise-collinearity-metrics"><span class="header-section-number">1.4.1</span> Non-pairwise Collinearity Metrics</h3>
+<p><strong>Condition Number:</strong></p>
 <p>However, multiple variables can be collinear even when individual pairs of variables have low correlation. One way to detect non-pairwise collinearity is to use the condition number, where we compare the largest and smallest eigenvalues of <span class="math inline">X^\intercal X</span>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(price2007 <span class="sc">~</span> distance <span class="sc">+</span> resid_walkscore <span class="sc">+</span> </span>
@@ -1666,6 +616,7 @@ zip1062                              -30.040888 -50.154050  -9.927726</code></pr
 </div>
 </div>
 <p>Ideally, we want the condition number to be small. The general cut-off is condition numbers larger than <span class="math inline">50</span> or <span class="math inline">100</span>. So, from the results above, we see that there is potentially concerning levels of collinearity among our predictors, which could influence the accuracy of our inference.</p>
+<p><strong>Variance Inflation Factors:</strong></p>
 <p>Another way to look at collinearity is with variance inflation factors (VIF), which can be interpreted as showing how much the variance of <span class="math inline">\hat \beta_j</span> is inflated relative to a model where there is no collinearity (and all columns are orthogonal).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># consider using type = 'predictor' for interactions (or ignoring VIFs since compared to main effecs)</span></span>
@@ -1681,19 +632,24 @@ zip                                 1.342293  1        1.158574</code></pre>
 </div>
 </div>
 <p>A general rule of thumb is that VIF values exceeding 5 warrant further investigation, and VIFs exceeding 10 are signs of serious multicollinearity requiring correction.</p>
-<p><em>General Notes:</em> If we are confronted with collinearity, then, the question to ask is “Have we chosen the correct predictors for the research question?” If we have, there is little to be done; if we have not, we can reconsider our choice of predictors and perhaps eliminate the collinear ones.</p>
-<p>If we are interested in prediction rather than in the coefficients, collinearity is a problem insofar as it creates high prediction variance, and we might reconsider our model and use a penalization model to reduce the prediction variance.</p>
+<p><strong>General Notes:</strong> If we are confronted with collinearity, then, the question to ask is:</p>
+<ul>
+<li>“Have we chosen the correct predictors for the research question?”</li>
+</ul>
+<p>If we have, there is little to be done; if we have not, we can reconsider our choice of predictors and perhaps eliminate the collinear ones.</p>
+<p>If we are interested in prediction rather than in the coefficients, <em>collinearity is a problem insofar as it creates high prediction variance, and we might reconsider our model and use a penalization model to reduce the prediction variance.</em>s</p>
+</section>
 </section>
 <section id="interactions" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="interactions"><span class="header-section-number">1.5</span> Interactions</h2>
 <p>An interaction allows one predictor’s association with the outcome to depend on values of another predictor.</p>
 <p>When an interaction is present, the normal interpretation of coefficients as slopes no longer holds for the predictors involved in the interaction.</p>
-<p><strong>Example 7.4</strong></p>
+<p><strong>See Example 7.4</strong></p>
 </section>
 <section id="hypothesis-tests" class="level2" data-number="1.6">
 <h2 data-number="1.6" class="anchored" data-anchor-id="hypothesis-tests"><span class="header-section-number">1.6</span> Hypothesis Tests</h2>
 <section id="t-tests" class="level3" data-number="1.6.1">
-<h3 data-number="1.6.1" class="anchored" data-anchor-id="t-tests"><span class="header-section-number">1.6.1</span> T Tests</h3>
+<h3 data-number="1.6.1" class="anchored" data-anchor-id="t-tests"><span class="header-section-number">1.6.1</span> t Tests</h3>
 <p>Many useful null hypotheses can be written in terms of linear combinations of the coefficients. For example, consider a linear model with a continuous predictor <span class="math inline">X_1</span> and dummy-coded regressor <span class="math inline">X_2 \in \{0,1 \}</span>:</p>
 <p><span class="math display">Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2</span> We could think of several null hypotheses to test:</p>
 <ul>
@@ -2805,8 +1761,6 @@ zip                                 1.342293  1        1.158574</code></pre>
 </div>
 <p><strong>If we have non-constant error variance and thus use the sandwich estimator, we can use the following code to conduct t tests and present our results:</strong></p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>p.values <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(fit_new, <span class="at">vcov =</span> <span class="fu">vcovHC</span>(fit_new)) <span class="sc">|&gt;</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> _<span class="sc">$</span>p.value</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2819,15 +1773,11 @@ zip                                 1.342293  1        1.158574</code></pre>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"Characteristic"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> p.values,</span>
 <span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">t-stat</span><span class="st">`</span> <span class="ot">=</span> t.stats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Standard errors computed by vcovHC(fit_new) </code></pre>
 </div>
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gt</span>(data_table) <span class="sc">|&gt;</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <div id="zzanemotft" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#zzanemotft table {
@@ -3973,8 +2923,10 @@ Table&nbsp;1: ADD
 <li><p>Associated with a one-unit increase in <span class="math inline">X_1</span></p></li>
 <li><p>Holding all other regressors constant</p></li>
 </ul>
-<p><em>Exact interpretation depending on if the predictor is continuous or a factor level.</em></p>
-<p><strong>Test for a factor coefficient:</strong> For a given flipper length, gentoo penguins have a smaller mean bill length (<span class="math inline">M = 47.5</span> mm, <span class="math inline">SD = 3.1</span>) than Adelie penguins (<span class="math inline">M = 38.8</span> mm, <span class="math inline">SD = 2.7</span>), <span class="math inline">t(336) = -3.5, p = 0.001</span>.</p>
+<p><strong>Exact interpretation depends on if the predictor is continuous or a factor level:</strong></p>
+<ul>
+<li><strong>Test for a factor coefficient:</strong> For a given flipper length, gentoo penguins have a smaller mean bill length (<span class="math inline">M = 47.5</span> mm, <span class="math inline">SD = 3.1</span>) than Adelie penguins (<span class="math inline">M = 38.8</span> mm, <span class="math inline">SD = 2.7</span>), <span class="math inline">t(336) = -3.5, p = 0.001</span>.</li>
+</ul>
 <p><em>In part calculated using <code>group_by()</code>:</em></p>
 <div class="cell">
 <details class="code-fold">
@@ -4464,26 +3416,23 @@ Table&nbsp;1: ADD
 </div>
 </div>
 </div>
-<p><strong>Confidence interval for a factor coefficient:</strong> For a given flipper length, gentoo penguin bills are shorter than Adelie penguin bills by an average of <span class="math inline">34.3</span> mm (95% CI <span class="math inline">[15.01, 15.64]</span>). <em>flipped due to interpreting as shorter</em></p>
-<p><strong>Test for slope:</strong> In Adelie penguins, there was a statistically significant association between flipper length and bill length, <span class="math inline">\hat \beta = 0.13</span>, <span class="math inline">t(336) = 4.17, p &lt; 0.001</span>.</p>
-<p><strong>Describe a slope:</strong> Among Adelie penguins, each additional millimeter of flipper length is associated with <span class="math inline">0.13</span> mm of additional bill length, on average (95% CI <span class="math inline">[0.07, 0.2]</span>).</p>
+<ul>
+<li><p><strong>Confidence interval for a factor coefficient:</strong> For a given flipper length, gentoo penguin bills are shorter than Adelie penguin bills by an average of <span class="math inline">34.3</span> mm (95% CI <span class="math inline">[15.01, 15.64]</span>).</p></li>
+<li><p><strong>Test for slope:</strong> In Adelie penguins, there was a statistically significant association between flipper length and bill length, <span class="math inline">\hat \beta = 0.13</span>, <span class="math inline">t(336) = 4.17, p &lt; 0.001</span>.</p></li>
+<li><p><strong>Describe a slope:</strong> Among Adelie penguins, each additional millimeter of flipper length is associated with <span class="math inline">0.13</span> mm of additional bill length, on average (95% CI <span class="math inline">[0.07, 0.2]</span>).</p></li>
+</ul>
 </section>
 <section id="interactions-1" class="level3" data-number="1.7.3">
 <h3 data-number="1.7.3" class="anchored" data-anchor-id="interactions-1"><span class="header-section-number">1.7.3</span> Interactions</h3>
-<p>An interaction allows one predictor’s association with the outcome to depend on values of another predictor. <strong>something about holding constant??</strong></p>
-<p><strong>Describe an interaction coefficient:</strong> For the interaction term between flipper length and species from <a href="#tbl-penguin-results" class="quarto-xref">Table&nbsp;1</a>: For Adelie penguins (the baseline level), the association between bill length and flipper length is <span class="math inline">0.13</span> mm of bill length per millimeter of flipper length, on average (95% CI <span class="math inline">[0.07, 0.20]</span>). But for Chinstrap penguins, the association is <span class="math inline">0.13 + 0.09 = 0.22</span> mm of bill length per millimeter of flipper length, on average (95% CI <span class="math inline">[0.11, 0.31]</span>).</p>
-<p><strong>LOOK AT THEOREM 5.5 AND HW 3</strong></p>
-<p><strong>A helpful way to visualize interaction terms, polynomial terms, (or other complex relationships) is to use an effects plot</strong></p>
+<p><strong>Describing an interaction coefficient:</strong> For the interaction term between flipper length and species from <a href="#tbl-penguin-results" class="quarto-xref">Table&nbsp;1</a>: For Adelie penguins (the baseline level), the association between bill length and flipper length is <span class="math inline">0.13</span> mm of bill length per millimeter of flipper length, on average (95% CI <span class="math inline">[0.07, 0.20]</span>). But for Chinstrap penguins, the association is <span class="math inline">0.13 + 0.09 = 0.22</span> mm of bill length per millimeter of flipper length, on average (95% CI <span class="math inline">[0.11, 0.31]</span>). [<strong>LOOK AT THEOREM 5.5 AND HW 3 TO CONFIRM</strong>]</p>
+<p><strong>A helpful way to visualize interaction terms, polynomial terms, (or other complex relationships) is to use an effects plot:</strong></p>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(penguin_fit,</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"flipper_length_mm"</span>, <span class="st">"species"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>() <span class="sc">+</span></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Flipper length (mm)"</span>, <span class="at">y =</span> <span class="st">"Bill length (mm)"</span>,</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Species"</span>,</span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Flipper length effect plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -4501,10 +3450,7 @@ Table&nbsp;1: ADD
 <li>Do a LRT/F-test for nested models to obtain the overall significance of the predictor-of-interest.</li>
 </ol>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit_new, fit_no_resid_ws)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Analysis of Variance Table
 
@@ -4522,12 +3468,9 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li>Create an effects plot fort the variable of interest</li>
 </ol>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(fit_new,</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"resid_walkscore"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -4540,11 +3483,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li>Give an example of an interpretation using the effects plot with specific values</li>
 </ol>
 <div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> <span class="fu">predict_response</span>(fit_new, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"resid_walkscore"</span>))</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(preds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 <div class="cell-output cell-output-stdout">
 <pre><code># Predicted values of price2007
 
@@ -4565,7 +3505,6 @@ Adjusted for:
 </div>
 </div>
 <p>For example, when the residual walk score is <span class="math inline">-43.01</span>, the predicted house price (in 2007) is $259,570 in Northampton, MA (95% CI <span class="math inline">[\$213,440, \$305,710]</span>) versus when the residual walk score is <span class="math inline">-36.08</span>, the predicted house price (in 2007) is $271,780 in Northampton, MA (95% CI <span class="math inline">[\$233,600, \$309,960]</span>) – holding all other covariates at their mean or reference level.</p>
-<p><strong>This is somewhat a bad example because residual walk score is not very interpretable, but in practice, should use values that would be practically significant</strong></p>
 </section>
 </section>
 </section>
@@ -4580,7 +3519,7 @@ Adjusted for:
 \log(\text{odds}(Y = 1 \mid X = x)) &amp;= \beta^\intercal x
 \end{aligned}
 </span></p>
-<p>Notably:</p>
+<p>and notably:</p>
 <p><span class="math display">\hat y_i = \widehat{\text{Pr}}(Y = 1 \mid X = x_i) = \text{logit}^{-1}(\hat \beta^\intercal x_i)</span></p>
 <section id="assumptions-1" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="assumptions-1"><span class="header-section-number">2.1</span> Assumptions</h2>
@@ -4592,7 +3531,8 @@ Adjusted for:
 </section>
 <section id="linearity-diagnostics" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="linearity-diagnostics"><span class="header-section-number">2.2</span> Linearity Diagnostics</h2>
-<p>To examine whether the log-odds is linearity related to our main regressor of interest (or our predictors more generally), we can use an <strong>Empirical link plot</strong>. <a href="#fig-logistic-empirical-link" class="quarto-xref">Figure&nbsp;6</a> shows that TWA core temperature during surgery appears to have an approximately linear relationship with the log-odds of superficial post-op infection but possibly a non-linear relationship with log-odds of a serious post-op infection.</p>
+<p><strong>Empirical Link Plot (EDA):</strong></p>
+<p><strong>Example:</strong> <a href="#fig-logistic-empirical-link" class="quarto-xref">Figure&nbsp;6</a> shows that TWA core temperature during surgery appears to have an approximately linear relationship with the log-odds of superficial post-op infection but possibly a non-linear relationship with log-odds of a serious post-op infection.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -4657,7 +3597,9 @@ Adjusted for:
 </div>
 </div>
 </div>
-<p>Another method is to use <strong>Partial Residuals</strong>, just like we did for linear regression. <a href="#fig-prelim-partials" class="quarto-xref">Figure&nbsp;7</a> shows that surgery duration and TWA core temperature both appear to have non-linear relationships with the log-odds of serious infection</p>
+<p><strong>Partial Residuals:</strong></p>
+<p>Another method is to use partial residuals, just like we did for linear regression.</p>
+<p><strong>Example:</strong> <a href="#fig-prelim-partials" class="quarto-xref">Figure&nbsp;7</a> shows that surgery duration and TWA core temperature both appear to have non-linear relationships with the log-odds of serious infection, which confirms what we see in the empirical link plot.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -4740,9 +3682,13 @@ Adjusted for:
 </div>
 </div>
 </div>
-<p>A third method is to use <strong>Randomized Quantile Residuals.</strong> We can use plots of randomized quantile residuals against predictors and fitted values, as with any other residuals, to check the overall fit of our model. If the model is correctly specified, we would want the conditional mean of the randomized quantile residuals to be approximately <span class="math inline">0.5</span>.</p>
+<p><strong>Randomized Quantile Residuals:</strong></p>
+<p>A third method is to use randomized quantile residuals. We can use plots of randomized quantile residuals against predictors and/or fitted values, as with any other residuals, to check the overall fit of our model.</p>
+<ul>
+<li>If the model is correctly specified, we would want the conditional mean of the randomized quantile residuals to be approximately <span class="math inline">0.5</span>.</li>
+</ul>
 <p>It is also useful to check that their distribution is indeed uniform (e.g.&nbsp;with a Q-Q plot). When the model is incorrectly specified, the distribution will not be uniform, producing patterns on the residual plots that can be interpreted.</p>
-<p>Below is an example with Pima women data from the <code>MASS</code> package.</p>
+<p><strong>Example:</strong> Below is an example with Pima women data from the <code>MASS</code> package.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -4815,13 +3761,13 @@ Adjusted for:
 </div>
 </div>
 <p>We start by converting the response from a factor to 0 or 1, so the smoother can take the average. <a href="#fig-calibration-plot" class="quarto-xref">Figure&nbsp;9</a> shows that the calibration looks good across most of the range in our data, but as the predicted probability gets over 0.6, we see odd behavior; examining the plotted points, it appears this is due to a few observations with high predicted probability but <span class="math inline">Y = 0</span>. We should not get too worried over two or three observations, so this is not particularly concerning.</p>
-<p><strong>But perfect calibration does not make a good model. Calibration hence should be used together with other measures of the adequacy of the model fit, not on its own.</strong></p>
+<p><em>But perfect calibration does not make a good model. Calibration hence should be used together with other measures of the adequacy of the model fit, not on its own!</em></p>
 </section>
 <section id="hypothesis-tests-1" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="hypothesis-tests-1"><span class="header-section-number">2.4</span> Hypothesis Tests</h2>
+<p>Wald tests are what <code>tidy()</code> defaults to for GLMs. Wald tests use a <span class="math inline">z</span> test statistic and, by default <code>tidy()</code> tests <span class="math inline">\beta = 0</span>.</p>
 <section id="wald-tests" class="level3" data-number="2.4.1">
 <h3 data-number="2.4.1" class="anchored" data-anchor-id="wald-tests"><span class="header-section-number">2.4.1</span> Wald Tests</h3>
-<p>In a Wald Test,</p>
 <p>First, we can find a confidence interval for a probability for a specific set of regressors:</p>
 <div class="cell">
 <details class="code-fold">
@@ -5910,13 +4856,13 @@ Table&nbsp;2: ADD
 </figure>
 </div>
 </div>
-<p><strong>Example interpretation:</strong> <a href="#tbl-logistic-coef" class="quarto-xref">Table&nbsp;2</a> gives the results of the logistic regression fit. Women with prior pregnancies were less likely to have diabetes (<span class="math inline">OR = 0.63, 95\% CI [0.27, 1.5]</span>), but this result was not statistically significant (<span class="math inline">z = -1.1, p = 0.27</span>). A larger sample may be necessary to determine if a relationship exists in the population.</p>
-<p><strong>Another one:</strong> Each unit of increase in blood pressure (measured in mm Hg) is associated with an increase in the log-odds of diabetes of <span class="math inline">0.04</span>, or a multiplication in the odds of diabetes by <span class="math inline">1.04</span> (<span class="math inline">95% CI [1.01, 1.07]</span>).</p>
+<p><strong>Example interpretation:</strong> <a href="#tbl-logistic-coef" class="quarto-xref">Table&nbsp;2</a> gives the results of the logistic regression fit. Women with prior pregnancies were less likely to have diabetes (<span class="math inline">OR = 0.63</span>, 95% CI <span class="math inline">[0.27, 1.5]</span>), but this result was not statistically significant (<span class="math inline">z = -1.1, p = 0.27</span>). A larger sample may be necessary to determine if a relationship exists in the population.</p>
+<p><strong>Another one:</strong> Each unit of increase in blood pressure (measured in mm Hg) is associated with an increase in the log-odds of diabetes of <span class="math inline">0.04</span>, or a multiplication in the odds of diabetes by <span class="math inline">1.04</span> (95% CI <span class="math inline">[1.01, 1.07]</span>).</p>
 </section>
 <section id="outliers" class="level2" data-number="2.6">
 <h2 data-number="2.6" class="anchored" data-anchor-id="outliers"><span class="header-section-number">2.6</span> Outliers</h2>
-<p>We can approximate Cook’s distance fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before.</p>
-<p>We could also likely remove the outliers and see if it qualitatively changes our findings if we aren’t sure.</p>
+<p>We can approximate <strong>Cook’s distance</strong> fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before.</p>
+<p>We could also likely <strong>remove the outliers and see if it qualitatively changes our findings</strong> if we aren’t sure.</p>
 </section>
 </section>
 <section id="other-exponential-families" class="level1" data-number="3">
@@ -5929,12 +4875,12 @@ Table&nbsp;2: ADD
 <li><p>The response variable follows the chosen distribution</p></li>
 <li><p>The mean of the response is related to the predictors through the chosen link function and functional form</p></li>
 </ol>
-<p><em>Residual diagnostics can be used to check the latter two assumptions.</em></p>
+<p><strong>Residual diagnostics can be used to check the latter two assumptions.</strong></p>
 </section>
 <section id="diagnostics" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="diagnostics"><span class="header-section-number">3.2</span> Diagnostics</h2>
-<p>We can use similar diagnostics to what we used for logistic regression. A good precursor to these is an <em>emprical link plot</em>, which would be done in EDA section.</p>
-<p><strong>Partial Residuals</strong></p>
+<p>We can use similar diagnostics to what we used for logistic regression. A good precursor to these is an <strong>empirical link plot</strong>, which would be done in the EDA section.</p>
+<p><strong>Partial Residuals:</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -5965,7 +4911,7 @@ Table&nbsp;2: ADD
 </div>
 </div>
 </div>
-<p><strong>Randomized Quantile Residuals</strong></p>
+<p><strong>Randomized Quantile Residuals:</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -6009,40 +4955,41 @@ Table&nbsp;2: ADD
 <p>The binomial distribution is a common response distribution whenever outcomes are binary, or whenever we count a certain binary outcome out of a total number of trials.</p>
 <p>The binomial distribution is suitable when there is a fixed and known total number of trials. Each observation hence consists of a number of successes and a total number of trials; the number of trials may differ between observations.</p>
 <p>The model is (with a logit-link function, the default):</p>
-<p><span class="math display">n_iY_i \mid X_i = x_i \sim \text{Binomial}(n_i, \text{logit}(\beta^\intercal x_i))</span> Hence, the sample proportion <span class="math inline">Y_i</span> should be proportional to <span class="math inline">\text{logit}(\beta^\intercal x_i)</span>. <strong><span class="math inline">Y_i</span> is the rate/probability of success!</strong></p>
+<p><span class="math display">n_iY_i \mid X_i = x_i \sim \text{Binomial}(n_i, \text{logit}(\beta^\intercal x_i))</span> Hence, the sample proportion <span class="math inline">Y_i</span> should be proportional to <span class="math inline">\text{logit}(\beta^\intercal x_i)</span>.</p>
+<ul>
+<li><strong><span class="math inline">Y_i</span> is the rate/probability of success!</strong></li>
+</ul>
 <p>In <code>R</code>, a binomial response variable for <span class="math inline">n &gt; 1</span> can be provided as a a two-column matrix with the number of successes and the number of failures.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(agridat)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>seed_fit_1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(germ, n <span class="sc">-</span> germ) <span class="sc">~</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>                    extract <span class="sc">+</span> gen,</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> crowder.seeds, <span class="at">family =</span> <span class="fu">binomial</span>())</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>seed_fit_2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(germ, n <span class="sc">-</span> germ) <span class="sc">~</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>                    extract <span class="sc">*</span> gen,</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> crowder.seeds, <span class="at">family =</span> <span class="fu">binomial</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="inference-and-predictions" class="level3" data-number="3.3.1">
 <h3 data-number="3.3.1" class="anchored" data-anchor-id="inference-and-predictions"><span class="header-section-number">3.3.1</span> Inference and Predictions</h3>
+<p><strong>Crowder Seed Example:</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(agridat)</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>crowder.seeds <span class="sc">|&gt;</span></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">germ_rate =</span> germ<span class="sc">/</span>n) <span class="sc">|&gt;</span></span>
-<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gen, <span class="at">y =</span> germ_rate, <span class="at">color =</span> extract))<span class="sc">+</span></span>
-<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
-<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Germination Rate'</span>, <span class="at">x =</span> <span class="st">'Seed Variety'</span>)<span class="sc">+</span></span>
-<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>crowder.seeds <span class="sc">|&gt;</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">germ_rate =</span> germ<span class="sc">/</span>n) <span class="sc">|&gt;</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gen, <span class="at">y =</span> germ_rate, <span class="at">color =</span> extract))<span class="sc">+</span></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">'Germination Rate'</span>, <span class="at">x =</span> <span class="st">'Seed Variety'</span>)<span class="sc">+</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="model-types_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="model-types_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>seed_fit_1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(germ, n <span class="sc">-</span> germ) <span class="sc">~</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>                    extract <span class="sc">+</span> gen,</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> crowder.seeds, <span class="at">family =</span> <span class="fu">binomial</span>())</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>seed_fit_2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(germ, n <span class="sc">-</span> germ) <span class="sc">~</span></span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>                    extract <span class="sc">*</span> gen,</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> crowder.seeds, <span class="at">family =</span> <span class="fu">binomial</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <div class="cell">
 <details class="code-fold">
@@ -6063,7 +5010,9 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p>Based on the analysis of deviance table, we conclude that that extract differs by side type, <span class="math inline">\chi^2(1) = 6.41, p = 0.011</span>.</p>
-<p>Like with logistic regression, we can use <code>tbl_regression</code> to compute the coefficients in each model. E.g., for the interaction model:</p>
+<ul>
+<li>Like with logistic regression, we can use <code>tbl_regression()</code> to compute the coefficients in each model. <em>E.g., for the interaction model:</em></li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(seed_fit_2, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -6603,7 +5552,9 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </div>
-<p>We can also compute the predictions and the standard errors. From the table, we see that the ’75 seeds with cucumber extract have the highest predicted probability of germination.</p>
+<ul>
+<li>We can also compute the predictions and the standard errors. From the table, we see that the ’75 seeds with cucumber extract have the highest predicted probability of germination.</li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># first we create a grid of all possible versions of the relevant regressors we want to get predictions for:</span></span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">gen =</span> <span class="fu">c</span>(<span class="st">"O75"</span>, <span class="st">"O73"</span>),</span>
@@ -7145,6 +6096,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p><strong>Thus, the variance of <span class="math inline">Y</span> depends on <span class="math inline">X</span> in Poisson GLMs!</strong></p>
 <section id="inference-and-predictions-1" class="level3" data-number="3.4.1">
 <h3 data-number="3.4.1" class="anchored" data-anchor-id="inference-and-predictions-1"><span class="header-section-number">3.4.1</span> Inference and Predictions</h3>
+<p><strong>Ant Example:</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -7683,6 +6635,7 @@ HabitatForest   1.4972591 2.393810e+00</code></pre>
 <section id="offsets" class="level3" data-number="3.4.2">
 <h3 data-number="3.4.2" class="anchored" data-anchor-id="offsets"><span class="header-section-number">3.4.2</span> Offsets</h3>
 <p>Offsets are useful when the observed counts recorded for different population sizes or time periods.</p>
+<p><strong>Smoking Example:</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -8314,7 +7267,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li><p>There might be correlations we did not account for (e.g., a binomial distribution assumes the <span class="math inline">n</span> trials are independent but what if success in one is correlated with increased success in the others?)</p></li>
 </ul>
 <p>A remedy for overdispersion is to use quasi-likleihood. These can be fit using <code>quasibinomial()</code> and <code>quasipoisson()</code> families in the <code>glm()</code> function. Compared to non-quasi models, the estimates of the coefficients will be the same, <strong>only the confidence intervals differ, witht heir width expanding by a constant factor</strong></p>
-<p><em>We can check for overdispersion using randomized quantile residuals</em></p>
+<p><strong>We can check for overdispersion using Q-Q plot of randomized quantile residuals</strong></p>
 <p><strong>Example:</strong> returning to the seed data:</p>
 <div class="cell">
 <div class="cell-output-display">
@@ -8854,8 +7807,9 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </div>
-<p><strong>Important Note:</strong> since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid and we can no longer use randomized quantile residuals or do line-ups. <em>We can still still do Wald Tests and interpret coefficients using the new Confidence Interval</em></p>
-<p>Estimating the dispersion parameter…</p>
+<p><strong>Important Note:</strong> since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid and we can no longer use randomized quantile residuals or do line-ups.</p>
+<p><strong>We can still still do Wald Tests and interpret coefficients using the new Confidence Interval</strong></p>
+<p><em>Estimating the dispersion parameter…</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">residuals</span>(ants_fit, <span class="at">type =</span> <span class="st">'deviance'</span>)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span>ants_fit<span class="sc">$</span>df.residual</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -8865,8 +7819,6 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </section>
 <section id="outliers-1" class="level2" data-number="3.6">
 <h2 data-number="3.6" class="anchored" data-anchor-id="outliers-1"><span class="header-section-number">3.6</span> Outliers</h2>
-<p>In a GLM, there is no “error” (in the sense of an error term in the model) and no error distribution, but it is still possible to have outliers.</p>
-<p>An observation may have an usual value that has a large influence on the fitted <span class="math inline">\hat \beta</span>. In small datasets with a few variables, we can spot such outliers in scatterplots of the data; but in larger datasets they are harder to notice, and so diagnostics are helpful.</p>
 <p>We can approximate <strong>Cook’s distance</strong> fairly well to estimate the influence of each observation on our coefficient estimates, using augment just like before.</p>
 <p>We could also likely <strong>remove the outliers and see if it qualitatively changes our findings</strong> if we aren’t sure.</p>
 <div class="cell">
@@ -8891,16 +7843,18 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <h1 data-number="4"><span class="header-section-number">4</span> Bootstrapping (Brief Aside)</h1>
 <p>So far, when we have discussed inference (such as hypothesis tests and confidence intervals), we have used it to try to learn about the underlying population relationships, such as to do inference on the factors associated with some outcome.</p>
 <p>To do this inference, we relied on mathematical derivations of the distribution of estimators and statistics. These derivations rely on certain about the data and the population it is drawn from, and if those assumptions are not true, the derivations are not valid.</p>
-<p>Boostrapping is an alternative way to esitmate the distributionof estimators and statistics. This can lead to more accurate uncertainty quantification for coefficients (that said, if the sample is not iid, then resampling from the observed data is not likel obtaining a sample from the population…)</p>
+<p>Boostrapping is an alternative way to esitmate the distribution of estimators and statistics. This can lead to more accurate uncertainty quantification for coefficients (that said, if the sample is not iid, then resampling from the observed data is not likel obtaining a sample from the population…)</p>
 </section>
 <section id="penalized-models" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Penalized Models</h1>
-<p>Helpful if we care about prediction over inference and thus want to minimize the total error (which is a combination of bias and variance).</p>
-<p>Penalization methods are also helpful when we have <span class="math inline">p &gt; n</span> since that have a unique solution even with a higher dimension of regressors than observations.</p>
+<ul>
+<li><p>Helpful if we care about prediction over inference and thus want to minimize the total error (which is a combination of bias and variance).</p></li>
+<li><p>Penalization methods are also helpful when we have <span class="math inline">p &gt; n</span> since that have a unique solution even with a higher dimension of regressors than observations.</p></li>
+</ul>
 <section id="ridge-regression" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="ridge-regression"><span class="header-section-number">5.1</span> Ridge Regression</h2>
-<p>Ridge Regression penalizes the L-2 norm of the covariaes. We can implement Ridge Regression using the <code>glmnet</code> package, which requires us to provide <span class="math inline">X</span> as a matrix and <span class="math inline">Y</span> as a vector of responses. Note that <code>glmnet()</code> standardizes each column to have variance 1 automatically.</p>
-<p>[For Ridge Regression we have <span class="math inline">\alpha = 0</span>!]</p>
+<p>Ridge Regression penalizes the L-2 norm of the covariates. We can implement Ridge Regression using the <code>glmnet</code> package, which requires us to provide <span class="math inline">X</span> as a matrix and <span class="math inline">Y</span> as a vector of responses. Note that <code>glmnet()</code> standardizes each column to have variance 1 automatically.</p>
+<p><em>[For Ridge Regression, <span class="math inline">\alpha = 0</span>]</em></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -8971,8 +7925,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </section>
 <section id="lasso" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="lasso"><span class="header-section-number">5.2</span> Lasso</h2>
-<p>Lasso is another penalized regression model. Its most useful propoerty is that (depending on the value of the penalization parameter), it forces many of the coefficient estimates to be exactly zero. That is, <strong>Lasso promotes sparsity</strong>, which matches real-world populations where we expect the true coefficients to be sparse (think: genetics)</p>
-<p>We can implement Lasso with <code>glmnet</code> (the only difference is now we set <span class="math inline">\alpha = 1</span>).</p>
+<p>Lasso is another penalized regression model. Its most useful propoerty is that (depending on the value of the penalization parameter), it forces many of the coefficient estimates to be exactly zero. That is, <strong>Lasso promotes sparsity</strong>, which matches real-world populations where we expect the true coefficients to be sparse (<em>think: genetics</em>)</p>
+<p>We can implement Lasso with <code>glmnet</code> (<em>the only difference is now we set <span class="math inline">\alpha = 1</span></em>).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -9035,8 +7989,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <p>Elastic net generalizes the case of Ridge Regression and Lasso by allowing both <span class="math inline">\alpha</span> and <span class="math inline">\lambda</span> to be hyperparameters, the combination of which trades off the benefits of Ridge Regression and Lasso. <strong>That is, with a <span class="math inline">\alpha</span> closer to one, more sparsity is induced, but with a <span class="math inline">\alpha</span> closer to 0, variance from collinearity is reduced more.</strong></p>
 <p><em>To cross-validate over both lambda and alpha, you have to manually loop over alpha values yourself, and run cv.glmnet() inside that loop.</em></p>
 </section>
-<section id="penalization-example-on-genetic-data" class="level2" data-number="5.4">
-<h2 data-number="5.4" class="anchored" data-anchor-id="penalization-example-on-genetic-data"><span class="header-section-number">5.4</span> Penalization Example (on Genetic Data)</h2>
+<section id="lasso-model-example-on-genetic-data" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="lasso-model-example-on-genetic-data"><span class="header-section-number">5.4</span> Lasso Model Example (on Genetic Data)</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">47</span>)</span>
 <span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>genedat <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">'data/genedat-exam.csv'</span>)</span>
@@ -9139,7 +8093,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </section>
 <section id="nested-cross-validation" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="nested-cross-validation"><span class="header-section-number">6.2</span> Nested Cross Validation</h2>
-<p>Often, we might need to do cross-validation and want to keep a hold out set that we can test our model on later. This is called nested cross validation. Here would be a general framework for nested cross validation:</p>
+<p>Often, we might need to do cross-validation and want to keep a hold out set that we can test our model on later. Here would be a a framework for nested cross validation:</p>
 <ol type="1">
 <li><p>Split the full dataset into testing and training (we might do this randomly, by time, by group, etc.)</p></li>
 <li><p>On the training data do k-fold cross validation to select any needed parameters (e.g., penalization parameters)</p></li>
@@ -9156,8 +8110,8 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </ul>
 <p><strong>For regression:</strong></p>
 <ul>
-<li><p>Mean-Squared Error</p></li>
-<li><p>Root Mean-Squared Error: a measure of the average magnitude of the errors between predicted and actual values in a regression model</p></li>
+<li><p>Mean-Squared Error (MSE)</p></li>
+<li><p>Root Mean-Squared Error (RMSE): a measure of the average magnitude of the errors between predicted and actual values in a regression model</p></li>
 <li><p>Actual versus Predicted Outcome Plot (ideal would be along the main diagonal)</p></li>
 </ul>
 <p><strong>For classification:</strong></p>
@@ -9186,21 +8140,28 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <li><p>When data is missing completely at random</p></li>
 <li><p>When missingness only depends on observed covariates</p></li>
 </ul>
-<p><em>Impute if clear value that should be filled in. Also, can impute to mean if needed (use just mean for time sake or if there is not much variability in the covariate, though can lead to biased estimates)</em></p>
+<p><strong>See examples in Chapter 22</strong></p>
+<p><em>Some general notes:</em></p>
+<ul>
+<li><p>Impute if clear value that should be filled in.</p></li>
+<li><p>Can impute to mean if needed (if there is not much variability in the covariate</p></li>
+<li><p>Generally, we weary of imputing the response variable only it is very clear</p></li>
+</ul>
 </section>
 <section id="multiple-testing" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Multiple Testing</h1>
-<p>One concern if we are conducting several hypothesis tests is multiple testing. While not in the scope for the DA exam, it could be an important limitation to the report.</p>
+<p>One concern if we are conducting several hypothesis tests is multiple testing. While not in the scope for the DA exam to correct for (likely), it could be an important limitation to mention in the report.</p>
 </section>
 <section id="causal-claims" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Causal Claims</h1>
-<p>If we are confident in our causal model and can control for the necessary confounders, we can estimate a chosen causal path. In this situation, our obligation is to make clear the limitations of our claims:</p>
+<p>If we are confident in our causal model and can control for the necessary confounders, we can estimate a chosen causal path.</p>
+<p><strong>In this situation, our obligation is to make clear the limitations of our claims:</strong></p>
 <ol type="1">
 <li><p>If our regression model is misspecified or otherwise incorrect, our estimates may be wrong.</p></li>
 <li><p>If our causal model is missing important confounders, or we have measured some confounders incompletely or inaccurately, our estimates may include some bias from confounding.</p></li>
 <li><p>If our data comes from a specific sample or subset of a population, the causal claims may not generalize beyond it.</p></li>
 </ol>
-<p>We also have to be careful about the scope of our causal claims. Choosing confounders to allow us to estimate one coefficient causally does not necessarily imply that all the other coefficients in the model can be interpreted causally.</p>
+<p><em>Note: choosing confounders to allow us to estimate one coefficient causally does not necessarily imply that all the other coefficients in the model can be interpreted causally.</em></p>
 </section>
 
 </main>
