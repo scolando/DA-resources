@@ -1,0 +1,306 @@
+---
+title: "Table Templates"
+author: Sara Colando
+execute:
+  echo: false
+  warning: false
+  message: false
+format:
+  pdf:
+    toc: false
+    number-sections: true
+    colorlinks: true
+    indent: true
+    keep-tex: true
+    fig-pos: H
+    link-citations: false
+---
+
+```{r packages}
+library(tidyverse)
+library(regressinator)
+library(broom)
+library(janitor)
+library(sandwich)
+library(car)
+library(lmtest)
+library(splines)
+library(gt)
+library(gtsummary)
+library(kableExtra)
+library(sf)
+library(GGally)
+library(patchwork)
+library(ggeffects)
+library(ggthemes)
+```
+
+# Markdown Table
+
+| Name                  | Description                                                                                                                                                                                                    |
+|--------------------|-------------------------------------------------------|
+| Serious Infection     | Whether the patient developed a serious infection within 30 days of surgery, such as a surgical site infection deep in the fascia or surrounding the organs or an intra-abdominal abscess caused by infection. |
+| Superficial Infection | Whether the patient developed a superficial infection within 30 days of surgery, such as a superficial site infection on skin around the incision or fascial dehiscence after the surgery.                     |
+| TWA Core Temperature  | The patient's time weighted average (TWA) core temperature during the surgery (in Celsius).                                                                                                                    |
+| Surgery Duration      | The length of the patient's colorectal surgery (in minutes).                                                                                                                                                   |
+| Steriod Usage         | Whether the patient was prescribed steriods before the surgery.                                                                                                                                                |
+| Weight Loss           | Whether the patient lost weight prior to the surgery, amount and time prior is not specified.                                                                                                                  |
+
+: Table of some of the relevant variables from the dataset as well as their descriptions and units, if applicable. {#tbl-variables}
+
+
+Use @tbl-variables to reference the table
+
+
+# `gt` Table
+
+```{r}
+rail_trails <- read_csv("data/rail-trails.csv") |>
+  rename(housenum = `housenum...1`) |>
+  select(-`housenum...15`) |>
+  mutate(across(where(is.character), as.factor),
+         zip = as.factor(zip))
+
+# dropping the columns that are descriptive/metadata but not useful for modeling
+rail_trail_modeling <- rail_trails |>
+  select(-housenum, -longitude, -latitude, -pctchange, 
+         -streetno, -contains("2014"), -contains("2011"), -contains("1998"), -adj2007) 
+```
+
+
+```{r}
+fit_new <- lm(price2007 ~ distance + walkscore + squarefeet + bedgroup + zip, data = rail_trail_modeling)
+```
+
+```{r}
+#| results: hide
+#| message: false
+#| warning: false
+
+p.values <- coeftest(fit_new, vcov = vcovHC(fit_new)) |>
+  tidy() |> pull(p.value)
+
+t.stats <- coeftest(fit_new, vcov = vcovHC(fit_new)) |>
+  tidy() |> pull(statistic)
+
+data_table <- as.data.frame(Confint(fit_new, vcov = vcovHC(fit_new))) |>
+  cbind(t.stats) |>
+  cbind(p.values) |>
+  rownames_to_column(var = "Characteristic") |>
+  rename(`p-value` = p.values,
+         `t-stat` = t.stats)
+```
+
+
+Use @tbl-results to reference the table
+
+```{r}
+#| label: tbl-results
+#| tbl-cap: "ADD here"
+
+data_table |>
+  filter(!str_detect(Characteristic, "ns|Intercept")) |>
+  gt() |>
+  fmt_number(decimals = 2) #|>
+  #tab_style(style = list(cell_fill(color = "slategray1")),
+  #          locations = cells_body(rows = 1))
+```
+
+```{r}
+#| label: tbl-results2
+#| tbl-cap: "ADD here"
+fit_new |> 
+  gtsummary::tbl_regression(include = c(distance, walkscore,
+                                        squarefeet, bedgroup,
+                                        zip)) #include remove intercept
+
+#can do exponentiate = TRUE for logistic, poisson, etc. to get away from 
+# log scale
+```
+
+
+# `kable` Table
+
+```{r}
+#| label: tbl-results3
+#| tbl-cap: "ADD here"
+df <- rail_trail_modeling |>
+  mutate(zip_logical = if_else(zip == "1060",TRUE, FALSE)) |>
+  group_by(distgroup) |>
+  summarize(`Bedrooms` = mean(bedrooms),
+            `Full Bathrooms` = mean(no_full_baths),
+            `Acres` = mean(acre),
+            `Square Footage` = mean(squarefeet),
+            `Total Rooms` = mean(no_rooms),
+            `Garage Spots` = mean(garage_spaces),
+            `Percent in ZIP 01060` = round(sum(zip_logical)/n()*100)) |>
+  pivot_longer(-distgroup, names_to = "Average House Attribute", values_to = "means",
+               names_transform = list(`Average House Attribute` = ~ factor(.x,
+               levels = c("Bedrooms", "Full Bathrooms", "Acres",
+                          "Square Footage", "Total Rooms", "Garage Spots", "Percent in ZIP 01060")))) |> 
+  spread(key = distgroup,value = means) |>
+  mutate(difference = Closer - `Farther Away`)
+
+df |>
+  knitr::kable(digits = 2,
+               col.names = NULL, format = "latex",
+               booktabs = TRUE, escape = FALSE) |>
+  add_header_above(c("Average\nHouse Attribute" = 1,
+  "Closer to Rail Trail\nAccess (n = 40)" = 1,
+  "Farther from Rail Trail\nAccess (n = 64)" = 1,
+  "Attribute Difference\n(Closer - Farther)" = 1))
+```
+
+```{r}
+flights <- read.csv("data/pit-flights.csv")
+
+flights |>
+  filter(!is.na(arr_delay)) |>
+  # use lubridate to turn month numbers into text:
+  mutate(month = month(time_hour, label = TRUE, abbr = FALSE)) |>
+  group_by(month) |>
+  summarize(arr_mean = mean(arr_delay),
+            arr_median = median(arr_delay),
+            arr_75 = quantile(arr_delay, probs = 0.75),
+            pct_delayed = mean(arr_delay > 15),
+            n = n()) |>
+  gt() |>
+  tab_header(title = "Flight delays from Pittsburgh") |>
+  tab_spanner(label = "Arrival delay",
+              columns = c(arr_mean, arr_median, arr_75)) |>
+  cols_label(month = "Month",
+             arr_mean = "Mean",
+             arr_median = "Median",
+             arr_75 = "75th pct.",
+             pct_delayed = "% delayed",
+             n = "Flights") |>
+  fmt_number(arr_mean, decimals = 1) |>
+  fmt_number(c(arr_75, n), decimals = 0) |>
+  fmt_percent(pct_delayed, decimals = 1) |>
+  cols_align("left", month)
+```
+
+
+```{r}
+core_temperature <- read_csv("data/core-temperature.csv") |>
+  select(-SurgeryType) |>
+  filter(DEAD == 0 | DurationHosp >= 30)
+```
+
+```{r}
+#| label: tbl-demographics-response
+#| tbl-cap: "Summary of the relationships between serious and superficial SSIs and the covariates from the dataset that are correlated with TWA core temperature. Patients who develop serious SSIs tend to have longer surgeries, as well as have higher likelihoods of pre-surgery weight loss and steroid usage than patients who do not develop a serious SSI (on average). There are similar trends when comparing patients who develop superficial SSIs to those who do not, except that patients who develop a superficial SSI  tend to have a higher BMI than patients who do not (on average)."
+
+continuous_output <- function(x, digits = 0) {
+  output <- paste0(round(mean(x), digits)," ± ",round(sd(x), digits))
+  return(output)
+}
+
+binary_output <- function(x) {
+  output <- paste0(sum(x), " (", round(sum(x)/n()*100, 0),"%)")
+  return(output)
+}
+
+df1 <- core_temperature |>
+  mutate(SeriousInfection = if_else(SeriousInfection == 1, "V1",
+                                  "V2")) |>
+  group_by(SeriousInfection) |>
+  summarize(`Total` = n(),
+            `Age (Years)` = continuous_output(Age),
+            `BMI` = continuous_output(BMI, 1), #need to fix charlson score and unit
+            #`Charlson Score` = continuous_output(CharlsonScore),
+            `Surgery Duration (Min)` = continuous_output(SurgDuration),
+            `Weight Loss` = binary_output(WGHTLOSS),
+            `Steriod Usage` = binary_output(SteroidHx)) |>
+  t() |>                     
+  as_tibble(rownames = "variable") |>
+  row_to_names(row_number = 1)
+
+df2 <- core_temperature |>
+  mutate(SuperficialInfection = if_else(SuperficialInfection == 1, "V3",
+                                  "V4")) |>
+  group_by(SuperficialInfection) |>
+  summarize(`Total` = n(),
+            `Age (Years)` = continuous_output(Age),
+            `BMI` = continuous_output(BMI, 1), #need to fix charlson score and unit
+           # `Charlson Score` = continuous_output(CharlsonScore),
+            `Surgery Duration (Minutes)` = continuous_output(SurgDuration),
+            `Weight Loss` = binary_output(WGHTLOSS),
+            `Steriod Usage` = binary_output(SteroidHx)) |>
+  t() |>                     
+  as_tibble(rownames = "variable") |>
+  row_to_names(row_number = 1) |> select(-SuperficialInfection)
+
+cbind(df1, df2) |>
+  gt()  |>
+  cols_label(SeriousInfection = md("**Patient Variable**"),
+             V1 = md("**Yes**"),
+             V3 = md("**Yes**"),
+             V2 = md("**No**"),
+             V4 = md("**No**")) |>
+  tab_spanner(
+    label = "Serious Infection",
+    columns = c(V1, V2)
+  ) |>
+  tab_spanner(
+    label = "Superficial Infection",
+    columns = c(V3, V4)
+  ) |>
+   tab_style(
+    style = cell_text(weight = "bold"),
+      locations = cells_column_spanners(spanners =c("Serious Infection",
+                                                    "Superficial Infection"))) |>
+  tab_footnote(footnote = md("For continuous variables, the form is: (mean) ± (standard deviation). For binary variables, the form is: (patients with condition) (% of total patients)."))
+```
+
+
+# Map Code
+
+```{r}
+#| eval: false
+#| echo: true
+county_bbox <- getbb("Hampshire County, Massachusetts")
+
+northampton_osm <- opq(bbox = county_bbox) |>
+  add_osm_feature(key = "highway") |> 
+  osmdata_sf()
+
+streets <- northampton_osm$osm_lines
+
+northampton_cycleways <- opq(bbox = county_bbox) |>
+  add_osm_feature(key = "highway", value = "cycleway") |>
+  osmdata_sf()
+
+cycleways <- northampton_cycleways$osm_lines 
+
+# next we have to filter out the cycleways that are not corresponding to the rail trail system
+
+nrows_vector <- sapply(cycleways$geometry, nrow)
+nrows_df <- data.frame(index = names(nrows_vector), nrows = nrows_vector) |>
+  uncount(nrows)
+
+rail_trail_indices <- st_coordinates(cycleways$geometry) |>
+  cbind(nrows_df) |>
+  group_by(index) |>
+  slice_min(n = 1, order_by = X) |>
+  filter(!str_detect(index, "^151|^189|^165|^351")) |> _$index |> unique()
+
+rel_cycleways <- cycleways |> filter(osm_id %in% rail_trail_indices)
+
+
+lat_limits <- c(42.3, 42.358)
+long_limits <- c(-72.73, -72.6)
+
+rail_trails |>
+  rename(`Est. House\nPrice (2007)` = price2007,
+         `Distance to\nRail Trail` = distance) |>
+  ggplot()+
+  geom_sf(data = streets, color = "grey80") +
+  geom_sf(data = rel_cycleways, color = "black")+
+  geom_point(aes(x = longitude, y = latitude, fill = `Distance to\nRail Trail`, size = `Est. House\nPrice (2007)`),
+             shape = 21, alpha = 0.7)+
+  scale_fill_gradientn(colors = brewer.pal(9, "YlGnBu"))+
+  coord_sf(xlim = long_limits, ylim = lat_limits, expand = FALSE) + 
+  theme_void()
+```
+
