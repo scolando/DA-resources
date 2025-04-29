@@ -1,5 +1,6 @@
 ---
 title: "Model Types and Diagnostics"
+author: 'Sara Colando'
 date: today
 execute:
   warning: false
@@ -48,7 +49,7 @@ library(ggthemes)
 
 (1) Linear relationship between $Y$ and the predictors $X$
 
-(2) Independence between observations (i.e., the residuals are uncorrelated)
+(2) Independence between observations (i.e., the errors are uncorrelated)
 
 (2) Constant error variance
 
@@ -1191,6 +1192,8 @@ Overdispersion is when there is more variance in $Y$ than the response distribut
 
 A remedy for overdispersion is to use quasi-likleihood. These can be fit using `quasibinomial()` and `quasipoisson()` families in the `glm()` function. Compared to non-quasi models, the estimates of the coefficients will be the same, **only the confidence intervals differ, witht heir width expanding by a constant factor**
 
+*We can check for overdispersion using randomized quantile residuals*
+
 **Example:** returning to the seed data:
 
 ```{r}
@@ -1206,7 +1209,16 @@ tbl_regression(seed_quasi, exponentiate = TRUE)
 ```
 
 
-**Important Note:** since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid. *So, probably only use quasi methods for predicted when we do not care about inference or to do senstivity analysis.* 
+**Important Note:** since overdispersed models no longer specify a distribution of the outcome conditional on the covariates, tests based on the log-likelihood are no longer valid and we can no longer use randomized quantile residuals or do line-ups. *We can still still do Wald Tests and interpret coefficients using the new Confidence Interval*
+
+Estimating the dispersion parameter...
+
+```{r}
+#| echo: true
+#| code-fold: false
+sum(residuals(ants_fit, type = 'deviance')^2)/ants_fit$df.residual
+```
+
 
 ## Outliers
 
@@ -1498,8 +1510,12 @@ Steps to handling missingness:
 
 **When complete-cases analysis is not concerning:**
 
+- When data is missing completely at random
 
-*Impute if clear value that should be filled in. Also, can impute to mean if needed (use just mean for time sake, though can lead to biased estimates)*
+- When missingness only depends on observed covariates
+
+
+*Impute if clear value that should be filled in. Also, can impute to mean if needed (use just mean for time sake or if there is not much variability in the covariate, though can lead to biased estimates)*
 
 # Multiple Testing
 
