@@ -206,6 +206,7 @@ window.Quarto = {
   </ul></li>
   <li><a href="#missing-data" id="toc-missing-data" class="nav-link" data-scroll-target="#missing-data"><span class="header-section-number">7</span> Missing Data</a></li>
   <li><a href="#multiple-testing" id="toc-multiple-testing" class="nav-link" data-scroll-target="#multiple-testing"><span class="header-section-number">8</span> Multiple Testing</a></li>
+  <li><a href="#causal-claims" id="toc-causal-claims" class="nav-link" data-scroll-target="#causal-claims"><span class="header-section-number">9</span> Causal Claims</a></li>
   </ul>
 </nav>
 </div>
@@ -9171,6 +9172,16 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <section id="multiple-testing" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Multiple Testing</h1>
 <p>One concern if we are conducting several hypothesis tests is multiple testing. While not in the scope for the DA exam, it could be an important limitation to the report.</p>
+</section>
+<section id="causal-claims" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Causal Claims</h1>
+<p>If we are confident in our causal model and can control for the necessary confounders, we can estimate a chosen causal path. In this situation, our obligation is to make clear the limitations of our claims:</p>
+<ol type="1">
+<li><p>If our regression model is misspecified or otherwise incorrect, our estimates may be wrong.</p></li>
+<li><p>If our causal model is missing important confounders, or we have measured some confounders incompletely or inaccurately, our estimates may include some bias from confounding.</p></li>
+<li><p>If our data comes from a specific sample or subset of a population, the causal claims may not generalize beyond it.</p></li>
+</ol>
+<p>We also have to be careful about the scope of our causal claims. Choosing confounders to allow us to estimate one coefficient causally does not necessarily imply that all the other coefficients in the model can be interpreted causally.</p>
 </section>
 
 </main>
