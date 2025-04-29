@@ -206,21 +206,42 @@ window.Quarto = {
 (2) The response variable follows a binomial distribution<br>
 (3) The mean of the response variable is related to the predictors through the logit link and functional form [We want a linear relationship between the predictor and the log-odds of the rate, <span class="math inline">\(Y_i\)</span>]:</p>
 <p><span class="math display">\[\log \left( \frac{rate}{1 - rate} \right)\]</span></p>
-<p><strong>Steps:</strong> (1) Fit model (consider interactions, non-linear patterns seen in EDA, confounding variables, transformations)<br>
-(2) Partial residual analysis to account for any remaining non-linearity with log-odds, adjusting the model as needed [diagnostic for non-linearity between log-odds and regressors]<br>
-(3) Plot randomized quantile residuals and corresponding Q-Q plot (with uniform distribution) for each predictor [second diagnostic for non-linearity between log-odds and regressors]<br>
-(4) Check for overdispersion using Q-Q plot from fitted. If there is evidence of overdispersion, move to <em>quasi-GLM section</em> (5) Check for how outliers identified during EDA impact on coefficients via Cook’s Distance<br>
-(6) Check for collinearity issues using EDA and VIF scores<br>
-(7) If we included spline or polynomial terms, conduct a deviance test and create effect plots, with example interpretations that include confidence intervals (<em>ensure it is on response scale, i.e., not log-odds</em>) (8) Otherwise, for linear terms, conduct a Wald test and provide test statistic (<span class="math inline">\(z\)</span>), p-value, and confidence interval (<em>exponentiate!</em>)<br>
-(9) If sample size is small, make a statement about power<br>
-(10) Limitations:<br>
-- Unaccounted for correlation (spatiotemporal), dependence of successive trials (e.g., success in one, increases probability of success in another)<br>
-- Unmeasured confounders<br>
-- Dichotomized confounders<br>
-- Non-random missingness<br>
-- Sample demographics versus population of interest<br>
-- Statistical versus practical significance<br>
-- If cohort study think about which type: prospective, retrospective, case-control</p>
+<p><strong>Steps:</strong></p>
+<ol type="1">
+<li>Fit model (consider interactions, non-linear patterns seen in EDA, confounding variables, transformations)<br>
+</li>
+<li>Partial residual analysis to account for any remaining non-linearity with log-odds, adjusting the model as needed [diagnostic for non-linearity between log-odds and regressors]<br>
+</li>
+<li>Plot randomized quantile residuals and corresponding Q-Q plot (with uniform distribution) for each predictor [second diagnostic for non-linearity between log-odds and regressors]<br>
+</li>
+<li>Check for overdispersion using Q-Q plot from fitted. If there is evidence of overdispersion, move to <em>quasi-GLM section</em></li>
+<li>Check for how outliers identified during EDA impact on coefficients via Cook’s Distance<br>
+</li>
+<li>Check for collinearity issues using EDA and VIF scores<br>
+</li>
+<li>If we included spline or polynomial terms, conduct a deviance test and create effect plots, with example interpretations that include confidence intervals (<em>ensure it is on response scale, i.e., not log-odds</em>)</li>
+<li>Otherwise, for linear terms, conduct a Wald test and provide test statistic (<span class="math inline">\(z\)</span>), p-value, and confidence interval (<em>exponentiate!</em>)<br>
+</li>
+<li>If sample size is small, make a statement about power<br>
+</li>
+<li>Limitations:<br>
+
+<ul>
+<li>Unaccounted for correlation (spatiotemporal), dependence of successive trials (e.g., success in one, increases probability of success in another)<br>
+</li>
+<li>Unmeasured confounders<br>
+</li>
+<li>Dichotomized confounders<br>
+</li>
+<li>Non-random missingness<br>
+</li>
+<li>Sample demographics versus population of interest<br>
+</li>
+<li>Statistical versus practical significance<br>
+</li>
+<li>If cohort study think about which type: prospective, retrospective, case-control</li>
+</ul></li>
+</ol>
 </section>
 <section id="poisson-regression" class="level2">
 <h2 class="anchored" data-anchor-id="poisson-regression">Poisson Regression</h2>

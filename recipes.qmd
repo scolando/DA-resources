@@ -73,6 +73,7 @@ For the binomial regression model $n_iY_i \mid X_i = x_i \sim \text{Binomial}(n_
 $$\log \left( \frac{rate}{1 - rate} \right)$$
 
 **Steps:**
+
 (1) Fit model (consider interactions, non-linear patterns seen in EDA, confounding variables, transformations) \
 (2) Partial residual analysis to account for any remaining non-linearity with log-odds, adjusting the model as needed [diagnostic for non-linearity between log-odds and regressors] \
 (3) Plot randomized quantile residuals and corresponding Q-Q plot (with uniform distribution) for each predictor [second diagnostic for non-linearity between log-odds and regressors] \
